@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GourmetLog - 美食秘菜單點餐紀錄系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+        .glow-effect {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        /* 專屬實體餐牌 PDF / 列印樣式 */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Noto Sans TC', sans-serif !important;
+            }
+            body > *:not(#printableMenu) {
+                display: none !important;
+            }
+            #printableMenu {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 10mm !important;
+                box-shadow: none !important;
+            }
+            .menu-page-break-avoid {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .leader-dots {
+                flex-grow: 1;
+                border-bottom: 2px dotted #94a3b8;
+                margin: 0 12px;
+                position: relative;
+                top: -4px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Welcome / Start Ordering Splash Screen -->
+    <div id="welcomeScreen" role="dialog" aria-modal="true" aria-label="點餐系統歡迎畫面" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center text-white transition-all duration-500">
+        <div class="max-w-md w-full bg-slate-900/80 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md flex flex-col items-center space-y-6">
+            <!-- Restaurant Badge / Logo -->
+            <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-brand-500/30 glow-effect">
+                <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <div class="space-y-2">
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-widest">自助點餐 & 美食紀錄系統</span>
+                <h1 id="welcomeRestaurantTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">荃港大冰室</h1>
+                <p class="text-xs sm:text-sm text-slate-400 font-medium">歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食</p>
+            </div>
+
+            <!-- Table Number / Mode Selector -->
+            <div class="w-full bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-chair text-amber-400" aria-hidden="true"></i> 用餐型態</span>
+                <span id="welcomeTableTag" class="bg-brand-600 text-white px-2.5 py-1 rounded-lg font-bold">堂食 / A-08 桌</span>
+            </div>
+
+            <!-- Big Start Ordering Button -->
+            <button onclick="startOrdering()" aria-label="開始點餐" class="w-full py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer">
+                <span>開始點餐</span>
+                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            
+            <!-- Brand Logo & Secret Mode Indicator -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showWelcomeScreen()" role="button" aria-label="返回點餐歡迎畫面">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
+                    <i class="fa-solid fa-utensils text-lg" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h1 id="appHeaderTitle" class="text-base sm:text-lg font-black text-slate-900 leading-none truncate">荃港大冰室</h1>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200/60 hidden sm:inline-block shrink-0">秘菜單 ‧ 美食誌</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium mt-0.5 truncate">個人數位美食紀錄系統</p>
+                </div>
+            </div>
+
+            <!-- Search Bar (Desktop) -->
+            <div class="flex-1 max-w-md hidden md:block">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" aria-hidden="true"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜尋食品、餐廳或心得標籤..." aria-label="搜尋食品、餐廳或心得標籤"
+                        class="w-full pl-10 pr-8 py-2 bg-slate-100/80 border border-transparent focus:border-brand-500 focus:bg-white focus:outline-none rounded-xl text-xs sm:text-sm transition-all duration-200">
+                    <button id="clearSearchBtn" onclick="clearSearch()" aria-label="清除搜尋字詞" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-circle-xmark text-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <button onclick="showWelcomeScreen()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="回到點餐歡迎頁面" aria-label="回到點餐歡迎頁面">
+                    <i class="fa-solid fa-house text-base sm:text-lg" aria-hidden="true"></i>
+                </button>
+
+                <button onclick="openAddModal()" aria-label="新增美食記錄" class="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm shadow-brand-500/20 transition-all duration-150 cursor-pointer">
+                    <i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
+                    <span class="hidden sm:inline">新增美食記錄</span>
+                    <span class="sm:hidden">紀錄</span>
+                </button>
+
+                <button onclick="toggleStatsModal()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="食評與數據統計" aria-label="查看食評與數據統計">
+                    <i class="fa-solid fa-chart-pie text-base sm:text-lg" aria-hidden="true"></i>
+                </button>
+
+                <button onclick="toggleDataModal()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="系統設定 & 資料管理" aria-label="開啟系統設定與資料管理">
+                    <i class="fa-solid fa-gear text-base sm:text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="px-4 pb-3 md:hidden">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" aria-hidden="true"></i>
+                <input type="text" id="mobileSearchInput" oninput="handleSearch()" placeholder="搜尋食品、餐廳或標籤..." aria-label="搜尋食品、餐廳或標籤"
+                    class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-transparent focus:border-brand-500 focus:bg-white focus:outline-none rounded-xl text-xs transition-all">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-36 sm:pb-32 flex flex-col md:flex-row gap-6">
+        
+        <!-- Sidebar / Category Selector -->
+        <aside class="w-full md:w-60 shrink-0 space-y-4">
+            <!-- Category Menu Navigation -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
+                    <span id="totalItemsBadge" class="text-[11px] font-extrabold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0 項</span>
+                </div>
+                <nav class="flex md:flex-col gap-1.5 overflow-x-auto hide-scrollbar pb-1 md:pb-0" id="categoryNav">
+                    <!-- Categories dynamically generated here -->
+                </nav>
+            </div>
+
+            <!-- Sorting & Quick Filters (Mobile & Desktop Accessible) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">排序與精選</h2>
+                <div>
+                    <label for="sortBy" class="block text-xs font-semibold text-slate-600 mb-1.5">排序方式</label>
+                    <select id="sortBy" onchange="renderMenu()" aria-label="選擇美食排序方式" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-brand-500">
+                        <option value="newest">最新紀錄優先</option>
+                        <option value="ratingDesc">美味評分最高 (5★ → 1★)</option>
+                        <option value="priceDesc">價格高至低</option>
+                        <option value="priceAsc">價格低至高</option>
+                    </select>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100">
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">快速評分篩選</label>
+                    <div class="flex flex-wrap gap-1.5" id="ratingFilterButtons">
+                        <button onclick="setRatingFilter(0)" id="rf-0" aria-label="篩選全部評分" class="rf-btn px-2.5 py-1 text-xs font-bold rounded-lg bg-brand-600 text-white cursor-pointer">全部</button>
+                        <button onclick="setRatingFilter(5)" id="rf-5" aria-label="僅顯示 5 星必吃美食" class="rf-btn px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">5★ 必吃</button>
+                        <button onclick="setRatingFilter(4)" id="rf-4" aria-label="顯示 4 星以上推薦美食" class="rf-btn px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">4★+ 推薦</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Content: Food Card Grid -->
+        <section class="flex-1">
+            <!-- Menu Top Header Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <div>
+                    <h2 id="currentCategoryTitle" class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                        <span>全部食品</span>
+                    </h2>
+                    <p id="itemCountText" class="text-xs text-slate-500 mt-1">載入中...</p>
+                </div>
+
+                <!-- Random Pick Button for indecisive eaters -->
+                <button onclick="pickRandomFood()" aria-label="是日推介隨機抽選美食" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-500/30 flex items-center gap-2 transition-all cursor-pointer">
+                    <i class="fa-solid fa-dice text-sm" aria-hidden="true"></i>
+                    <span>是日推介</span>
+                </button>
+            </div>
+
+            <!-- Food Grid Container -->
+            <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Food cards injected dynamically -->
+            </div>
+
+            <!-- Empty State Placeholder -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center space-y-3 bg-white rounded-2xl border border-dashed border-slate-200">
+                <div class="w-16 h-16 rounded-full bg-brand-50 flex items-center justify-center text-brand-500 text-2xl">
+                    <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="font-bold text-slate-800 text-base">暫無相關美食紀錄</h3>
+                    <p class="text-xs text-slate-400">點擊右上方「新增美食記錄」來加入第一道料理吧！</p>
+                </div>
+                <button onclick="openAddModal()" aria-label="新增紀錄" class="mt-2 px-4 py-2 bg-brand-600 text-white font-bold text-xs rounded-xl hover:bg-brand-700 transition-all cursor-pointer">
+                    <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> 新增紀錄
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Cart Button (Bottom-Right elevated for Netlify Badge clearance) -->
+    <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-24 right-5 sm:right-6 z-[90] w-14 h-14 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
+        <i class="fa-solid fa-cart-shopping text-xl sm:text-2xl" aria-hidden="true"></i>
+        <span id="floatingCartBadge" class="hidden absolute -top-1 -right-1 bg-amber-400 text-slate-900 font-black text-xs sm:text-sm w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 border-white shadow-md">0</span>
+    </button>
+
+    <!-- Slide-over Cart Drawer -->
+    <div id="cartDrawer" role="dialog" aria-modal="true" aria-label="今日點單購物車" class="fixed inset-y-0 right-0 z-[100] w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col hidden" aria-hidden="true">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-receipt text-amber-400 text-lg" aria-hidden="true"></i>
+                <h3 class="font-bold text-base">今日點單清單</h3>
+            </div>
+            <button onclick="toggleCartDrawer()" aria-label="關閉購物車" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer">
+                <i class="fa-solid fa-xmark text-xl" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div id="cartList" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Cart items injected dynamically -->
+        </div>
+
+        <!-- Elevated bottom action area to clear Netlify footer badge -->
+        <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 space-y-3 pb-28 sm:pb-24">
+            <div class="flex justify-between items-center text-sm">
+                <span class="font-bold text-slate-600">總計預算金額</span>
+                <span id="cartTotal" class="text-xl font-black text-brand-600">HK$0.0</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="clearCart()" aria-label="清空菜單" class="py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                    清空菜單
+                </button>
+                <button onclick="showOrderSuccessToast()" aria-label="確認送出點單" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">
+                    確認送出點單
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Detail Modal -->
+    <div id="detailModal" role="dialog" aria-modal="true" aria-label="美食詳細資訊" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div id="detailModalCard" class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
+            <div class="relative h-60 bg-slate-100">
+                <img id="detailImg" alt="美食相片" class="w-full h-full object-cover">
+                <button onclick="closeDetailModal()" aria-label="關閉詳細資訊" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/60 text-white flex items-center justify-center hover:bg-slate-900 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+                <span id="detailCategoryTag" class="absolute bottom-3 left-3 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-sm"></span>
+            </div>
+            
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+                <div class="flex justify-between items-start gap-3">
+                    <div>
+                        <h3 id="detailTitle" class="text-xl font-black text-slate-900"></h3>
+                        <p id="detailLocation" class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-brand-500" aria-hidden="true"></i>
+                            <span></span>
+                        </p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span id="detailPrice" class="text-xl font-black text-brand-600"></span>
+                        <div id="detailStars" class="flex items-center gap-0.5 text-amber-400 text-xs mt-0.5"></div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1.5">
+                    <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase">
+                        <span>美食筆記與心得</span>
+                        <span id="detailDate"></span>
+                    </div>
+                    <p id="detailNotes" class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button onclick="deleteItemFromModal()" aria-label="刪除此紀錄" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                    <i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> 刪除此紀錄
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="editCurrentItem()" aria-label="編輯紀錄" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                        <i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> 編輯
+                    </button>
+                    <button onclick="addToCartFromModal()" aria-label="加入點單" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer">
+                        <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> 加入點單
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Edit Food Record Modal -->
+    <div id="addModal" role="dialog" aria-modal="true" aria-label="新增或編輯美食紀錄" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div id="addModalCard" class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h3 id="addModalTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> 新增美食點餐紀錄
+                </h3>
+                <button onclick="closeAddModal()" aria-label="關閉新增視窗" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <form id="foodForm" onsubmit="handleFormSubmit(event)" class="space-y-3.5">
+                <input type="hidden" id="editingItemId">
+
+                <!-- Image Upload & Camera Capture -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">相片 (拍照 / 相冊選擇)</label>
+                    <div class="relative h-36 bg-slate-50 border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden group">
+                        <input type="file" accept="image/*" onchange="previewAndCompressImage(event)" aria-label="上載相片" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                        <img id="imagePreview" alt="相片預覽" class="hidden absolute inset-0 w-full h-full object-cover">
+                        <div id="imagePlaceholder" class="text-center space-y-1">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-brand-500 transition-colors" aria-hidden="true"></i>
+                            <p class="text-xs font-semibold text-slate-500">點擊拍照或上載食品相片</p>
+                            <p class="text-[10px] text-slate-400">（系統將自動智慧壓縮相片）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title & Category -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="inputTitle" class="block text-xs font-bold text-slate-700 mb-1">食品名稱 *</label>
+                        <input type="text" id="inputTitle" required placeholder="例如：黑豚叉燒拉麵" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label for="inputCategory" class="block text-xs font-bold text-slate-700 mb-1">類別 *</label>
+                        <select id="inputCategory" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
+                            <option value="主食">主食</option>
+                            <option value="特飲">特飲</option>
+                            <option value="甜品">甜品</option>
+                            <option value="小食">小食</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Price & Location -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="inputPrice" class="block text-xs font-bold text-slate-700 mb-1">價格 (HK$) *</label>
+                        <input type="number" id="inputPrice" step="0.1" min="0" required placeholder="88.0" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label for="inputLocation" class="block text-xs font-bold text-slate-700 mb-1">餐廳/地點</label>
+                        <input type="text" id="inputLocation" placeholder="例如：銅鑼灣" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <!-- Star Rating Picker -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-bold text-slate-700">美味星級評分</label>
+                        <span id="ratingText" class="text-xs font-black text-amber-500">5.0 ★</span>
+                    </div>
+                    <div id="starPicker" class="flex gap-2">
+                        <button type="button" onclick="setRating(1)" data-value="1" aria-label="評分 1 星" class="star-btn text-xl text-amber-400 hover:scale-110 transition-transform cursor-pointer"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+                        <button type="button" onclick="setRating(2)" data-value="2" aria-label="評分 2 星" class="star-btn text-xl text-amber-400 hover:scale-110 transition-transform cursor-pointer"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+                        <button type="button" onclick="setRating(3)" data-value="3" aria-label="評分 3 星" class="star-btn text-xl text-amber-400 hover:scale-110 transition-transform cursor-pointer"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+                        <button type="button" onclick="setRating(4)" data-value="4" aria-label="評分 4 星" class="star-btn text-xl text-amber-400 hover:scale-110 transition-transform cursor-pointer"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+                        <button type="button" onclick="setRating(5)" data-value="5" aria-label="評分 5 星" class="star-btn text-xl text-amber-400 hover:scale-110 transition-transform cursor-pointer"><i class="fa-solid fa-star" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+
+                <!-- Food Notes -->
+                <div>
+                    <label for="inputNotes" class="block text-xs font-bold text-slate-700 mb-1">美食筆記 / 心得短評</label>
+                    <textarea id="inputNotes" rows="2" placeholder="記下湯底濃郁度、配料建議或再訪指數..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeAddModal()" class="w-1/3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">取消</button>
+                    <button type="submit" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">儲存美食紀錄</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statsModal" role="dialog" aria-modal="true" aria-label="美食數據與消費統計" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> 美食數據與消費統計
+                </h3>
+                <button onclick="toggleStatsModal()" aria-label="關閉統計" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-brand-50 p-4 rounded-2xl border border-brand-100 text-center">
+                    <span class="text-[10px] font-bold text-brand-600 uppercase">總紀錄食品</span>
+                    <p id="statTotalItems" class="text-2xl font-black text-brand-700 mt-1">0</p>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 text-center">
+                    <span class="text-[10px] font-bold text-amber-600 uppercase">平均餐點單價</span>
+                    <p id="statAvgPrice" class="text-2xl font-black text-amber-700 mt-1">HK$0.0</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-slate-700">類別分佈</h4>
+                <div id="categoryBreakdown" class="space-y-2 text-xs">
+                    <!-- Category stats injected dynamically -->
+                </div>
+            </div>
+
+            <button onclick="toggleStatsModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
+                關閉
+            </button>
+        </div>
+    </div>
+
+    <!-- Data Import / Export & Settings Backup Modal -->
+    <div id="dataModal" role="dialog" aria-modal="true" aria-label="系統設定與資料管理" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> 點餐系統設定 & 資料管理
+                    </h3>
+                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.6</span>
+                </div>
+                <button onclick="toggleDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="space-y-1.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                <label for="inputRestaurantName" class="block text-xs font-bold text-slate-700">餐廳/點餐系統名稱</label>
+                <div class="flex gap-2">
+                    <input type="text" id="inputRestaurantName" placeholder="例如：荃港大冰室" 
+                        class="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-brand-500">
+                    <button onclick="saveRestaurantName()" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer">
+                        儲存名稱
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                你可以隨時備份你的私人美食記錄，或是匯入之前的 JSON 備份檔，避免紀錄因更換手機而流失。
+            </p>
+
+            <div class="space-y-2 pt-1">
+                <button onclick="exportMenuPDF()" aria-label="匯出或列印餐廳餐牌 PDF" class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-500/20 transition-all cursor-pointer">
+                    <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> 匯出 / 列印專屬餐廳餐牌 (PDF)
+                </button>
+                <div>
+                    <button onclick="exportData()" aria-label="匯出 JSON 備份" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <i class="fa-solid fa-download text-brand-600" aria-hidden="true"></i> 匯出 JSON 備份檔案
+                    </button>
+                    <p class="text-[11px] text-slate-400 text-center mt-1">iPhone：會開分享選單，請選「儲存到檔案」</p>
+                </div>
+                <label class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-upload text-brand-600" aria-hidden="true"></i> 匯入 JSON 備份檔案
+                    <input type="file" accept=".json" onchange="importData(event)" aria-label="選擇 JSON 備份檔案" class="hidden">
+                </label>
+                <button onclick="resetToSampleData()" aria-label="重置為預設範例菜單" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border border-red-100 cursor-pointer">
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> 重置為預設範例菜單
+                </button>
+            </div>
+
+            <button onclick="toggleDataModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
+                完成
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Dialog (P1 Protection against accidental deletion) -->
+    <div id="confirmModal" role="dialog" aria-modal="true" aria-label="確認對話框" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl text-center space-y-4 transform scale-95 transition-transform duration-200">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            </div>
+            <div>
+                <h3 id="confirmModalTitle" class="font-bold text-base text-slate-900">確定執行此操作？</h3>
+                <p id="confirmModalMsg" class="text-xs text-slate-500 mt-1">這個動作無法復原。</p>
+            </div>
+            <div class="flex gap-2 pt-1">
+                <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">取消</button>
+                <button id="confirmModalActionBtn" onclick="executeConfirmAction()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer">確認執行</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast (Top on mobile to clear bottom CTAs; Bottom-right on desktop) -->
+    <div id="toast" class="fixed top-4 left-4 right-4 sm:top-auto sm:bottom-24 sm:left-auto sm:right-6 z-[110] bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform -translate-y-12 sm:translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base" aria-hidden="true"></i>
+        <span id="toastMsg" class="text-xs sm:text-sm font-semibold">提示訊息</span>
+    </div>
+
+    <!-- Printable Menu Container for PDF Export -->
+    <div id="printableMenu" class="hidden print:block bg-white text-slate-900 p-8 max-w-4xl mx-auto"></div>
+
+    <!-- Menu Preview & Print Modal -->
+    <div id="menuPreviewModal" role="dialog" aria-modal="true" aria-label="餐牌預覽與列印" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex flex-col items-center justify-start p-3 sm:p-6 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
+        <div class="w-full max-w-4xl bg-slate-900 text-white rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-2xl sticky top-0 z-20 border border-slate-700">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                    <i class="fa-solid fa-file-pdf text-lg" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-white">專屬餐廳餐牌預覽</h3>
+                    <p class="text-[11px] text-slate-400">請確認餐牌視覺排版，可點擊列印另存為 PDF</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="triggerPrint()" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
+                    <i class="fa-solid fa-print" aria-hidden="true"></i> 直接列印 / 另存 PDF
+                </button>
+                <button onclick="openPrintInNewWindow()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-all cursor-pointer" title="在新分頁獨立開啟並列印">
+                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 新頁面列印
+                </button>
+                <button onclick="closeMenuPreviewModal()" aria-label="關閉預覽" class="p-2 text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="menuPreviewContent" class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden p-4 sm:p-8 text-slate-900 border border-slate-200">
+            <!-- Rendered Menu Content Here -->
+        </div>
+    </div>
+
+    <script>
+        // XSS Helper: Escapes unsafe HTML characters in user input
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        const defaultFoodItems = [
+            {
+                id: '1',
+                title: '極上黑豚叉燒拉麵',
+                category: '主食',
+                price: 88.0,
+                rating: 5,
+                location: '一蘭拉麵 / 銅鑼灣',
+                image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+                notes: '湯底濃郁香醇，叉燒入口即化！加半熟溫泉蛋味道更佳。下次要試多蔥辣醬。',
+                date: '2026-10-15'
+            },
+            {
+                id: '2',
+                title: '宇治抹茶鮮奶拿鐵',
+                category: '特飲',
+                price: 42.0,
+                rating: 4.5,
+                location: 'Arabica Cafe',
+                image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=800&q=80',
+                notes: '抹茶香氣十足，微苦甘甜，燕麥奶底十分順滑。拉花非常精美！',
+                date: '2026-10-18'
+            },
+            {
+                id: '3',
+                title: '焦糖香草舒芙蕾鬆餅',
+                category: '甜品',
+                price: 98.0,
+                rating: 4.8,
+                location: 'Flipper\'s 梳乎厘',
+                image: 'https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=800&q=80',
+                notes: '空氣感極強，入口即化！配合香草冰淇淋和焦糖脆片，美味滿分。',
+                date: '2026-10-20'
+            },
+            {
+                id: '4',
+                title: '日式和牛一口串',
+                category: '小食',
+                price: 65.0,
+                rating: 4,
+                location: '鳥幸居酒屋',
+                image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80',
+                notes: '和牛油脂豐盈，外焦內嫩。搭配生啤簡直完美！',
+                date: '2026-10-21'
+            }
+        ];
+
+        let foodItems = [];
+        let currentCategory = '全部';
+        let currentRatingFilter = 0; // 0 = all, 4 = 4+, 5 = 5.0 only
+        let currentRatingInput = 5;
+        let cart = []; // Array of { ...item, qty: number }
+        let activeModalItemId = null;
+        let restaurantName = '荃港大冰室';
+        let pendingConfirmAction = null;
+        let toastTimer = null;
+
+        // Focus Trap Module
+        let activeFocusTrap = null;
+        let previousFocusedElement = null;
+
+        function trapFocus(containerEl) {
+            if (!containerEl) return;
+            previousFocusedElement = document.activeElement;
+            const focusables = containerEl.querySelectorAll(
+                'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            if (focusables.length === 0) return;
+
+            const firstEl = focusables[0];
+            const lastEl = focusables[focusables.length - 1];
+
+            setTimeout(() => firstEl.focus(), 50);
+
+            const handleKeyDown = function(e) {
+                if (e.key !== 'Tab') return;
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstEl || !containerEl.contains(document.activeElement)) {
+                        e.preventDefault();
+                        lastEl.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastEl || !containerEl.contains(document.activeElement)) {
+                        e.preventDefault();
+                        firstEl.focus();
+                    }
+                }
+            };
+
+            containerEl.addEventListener('keydown', handleKeyDown);
+            activeFocusTrap = { containerEl, handleKeyDown };
+        }
+
+        function releaseFocusTrap() {
+            if (activeFocusTrap) {
+                activeFocusTrap.containerEl.removeEventListener('keydown', activeFocusTrap.handleKeyDown);
+                activeFocusTrap = null;
+            }
+            if (previousFocusedElement && typeof previousFocusedElement.focus === 'function') {
+                previousFocusedElement.focus();
+                previousFocusedElement = null;
+            }
+        }
+
+        const categories = [
+            { name: '全部', icon: 'fa-border-all' },
+            { name: '主食', icon: 'fa-bowl-food' },
+            { name: '特飲', icon: 'fa-glass-water' },
+            { name: '甜品', icon: 'fa-ice-cream' },
+            { name: '小食', icon: 'fa-cookie-bite' }
+        ];
+
+        window.onload = function() {
+            setRandomTableNumber();
+            loadRestaurantName();
+            loadItems();
+            renderCategories();
+            renderMenu();
+            setRating(5);
+            setupGlobalAccessibility();
+
+            // Handle invalid input for negative price
+            const priceInput = document.getElementById('inputPrice');
+            if (priceInput) {
+                priceInput.addEventListener('invalid', function(e) {
+                    e.preventDefault();
+                    showToast('請輸入合理的價格 (不可低於 0)！', true);
+                });
+            }
+        };
+
+        function setupGlobalAccessibility() {
+            // Support ESC key closing active modal / drawer
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllModals();
+                }
+            });
+
+            // Support Backdrop clicking to close modals
+            const modalIds = ['detailModal', 'addModal', 'statsModal', 'dataModal', 'confirmModal', 'menuPreviewModal'];
+            modalIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', function(e) {
+                        if (e.target === el) {
+                            closeModalById(id);
+                        }
+                    });
+                }
+            });
+        }
+
+        function closeAllModals() {
+            closeDetailModal();
+            closeAddModal();
+            closeStatsModal();
+            closeDataModal();
+            closeConfirmModal(false);
+            closeMenuPreviewModal();
+            closeCartDrawer();
+        }
+
+        function closeModalById(id) {
+            if (id === 'detailModal') closeDetailModal();
+            else if (id === 'addModal') closeAddModal();
+            else if (id === 'statsModal') closeStatsModal();
+            else if (id === 'dataModal') closeDataModal();
+            else if (id === 'confirmModal') closeConfirmModal(false);
+            else if (id === 'menuPreviewModal') closeMenuPreviewModal();
+        }
+
+        function setRandomTableNumber() {
+            const zones = ['A', 'B', 'C', 'D', 'E', 'V'];
+            const randomZone = zones[Math.floor(Math.random() * zones.length)];
+            const randomNum = Math.floor(Math.random() * 18) + 1;
+            const formattedNum = randomNum < 10 ? `0${randomNum}` : `${randomNum}`;
+            const tableElement = document.getElementById('welcomeTableTag');
+            if (tableElement) {
+                tableElement.textContent = `堂食 / ${randomZone}-${formattedNum} 桌`;
+            }
+        }
+
+        function loadRestaurantName() {
+            const storedName = localStorage.getItem('gourmet_restaurant_name');
+            if (storedName) {
+                restaurantName = storedName;
+            }
+            updateRestaurantNameUI();
+        }
+
+        function updateRestaurantNameUI() {
+            document.getElementById('appHeaderTitle').textContent = restaurantName;
+            document.getElementById('welcomeRestaurantTitle').textContent = restaurantName;
+            document.getElementById('inputRestaurantName').value = restaurantName;
+        }
+
+        function saveRestaurantName() {
+            const inputVal = document.getElementById('inputRestaurantName').value.trim();
+            if (!inputVal) {
+                showToast('請輸入有效的餐廳名稱', true);
+                return;
+            }
+            restaurantName = inputVal;
+            localStorage.setItem('gourmet_restaurant_name', restaurantName);
+            updateRestaurantNameUI();
+            showToast('已更新點餐系統名稱！');
+        }
+
+        function loadItems() {
+            const stored = localStorage.getItem('gourmet_log_items');
+            if (stored) {
+                try {
+                    foodItems = JSON.parse(stored);
+                } catch (e) {
+                    foodItems = [...defaultFoodItems];
+                }
+            } else {
+                foodItems = [...defaultFoodItems];
+            }
+        }
+
+        function startOrdering() {
+            const welcome = document.getElementById('welcomeScreen');
+            welcome.classList.add('opacity-0', 'pointer-events-none');
+            releaseFocusTrap();
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                welcome.setAttribute('aria-hidden', 'true');
+            }, 500);
+        }
+
+        function showWelcomeScreen() {
+            const welcome = document.getElementById('welcomeScreen');
+            welcome.classList.remove('hidden');
+            welcome.removeAttribute('aria-hidden');
+            setTimeout(() => {
+                welcome.classList.remove('opacity-0', 'pointer-events-none');
+                trapFocus(welcome);
+            }, 10);
+        }
+
+        function saveItems() {
+            try {
+                localStorage.setItem('gourmet_log_items', JSON.stringify(foodItems));
+            } catch (e) {
+                showToast('儲存空間已滿，請匯出備份或刪除部分舊紀錄', true);
+            }
+        }
+
+        function renderCategories() {
+            const nav = document.getElementById('categoryNav');
+
+            nav.innerHTML = categories.map(cat => {
+                const active = cat.name === currentCategory;
+                const activeClasses = active 
+                    ? 'bg-brand-600 text-white font-bold shadow-sm shadow-brand-500/30' 
+                    : 'bg-slate-100 md:bg-transparent text-slate-600 hover:bg-slate-100 font-semibold';
+                
+                return `
+                    <button onclick="selectCategory('${escapeHtml(cat.name)}')" aria-label="切換至 ${escapeHtml(cat.name)} 類別" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all cursor-pointer ${activeClasses}">
+                        <i class="fa-solid ${cat.icon} text-xs" aria-hidden="true"></i>
+                        <span>${escapeHtml(cat.name)}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCategory(catName) {
+            currentCategory = catName;
+            renderCategories();
+            renderMenu();
+        }
+
+        function setRatingFilter(stars) {
+            currentRatingFilter = stars;
+            document.querySelectorAll('.rf-btn').forEach(btn => {
+                btn.className = 'rf-btn px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer';
+            });
+            const activeBtn = document.getElementById(`rf-${stars}`);
+            if (activeBtn) {
+                activeBtn.className = 'rf-btn px-2.5 py-1 text-xs font-bold rounded-lg bg-brand-600 text-white cursor-pointer';
+            }
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById('foodGrid');
+            const emptyState = document.getElementById('emptyState');
+            const titleEl = document.getElementById('currentCategoryTitle');
+            const countEl = document.getElementById('itemCountText');
+            const totalBadge = document.getElementById('totalItemsBadge');
+
+            const searchVal = (document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value || '').trim().toLowerCase();
+            const sortBy = document.getElementById('sortBy').value;
+
+            // Clear search button status
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchVal) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+
+            titleEl.querySelector('span').textContent = currentCategory === '全部' ? '全部點餐紀錄' : `${currentCategory} 菜單`;
+
+            // Filtering logic
+            let filtered = foodItems.filter(item => {
+                const matchCat = currentCategory === '全部' || item.category === currentCategory;
+                const matchSearch = !searchVal || 
+                                    item.title.toLowerCase().includes(searchVal) ||
+                                    (item.location && item.location.toLowerCase().includes(searchVal)) ||
+                                    (item.notes && item.notes.toLowerCase().includes(searchVal));
+                
+                let matchRating = true;
+                if (currentRatingFilter === 5) matchRating = item.rating >= 5.0;
+                else if (currentRatingFilter === 4) matchRating = item.rating >= 4.0;
+
+                return matchCat && matchSearch && matchRating;
+            });
+
+            // Sorting logic
+            filtered.sort((a, b) => {
+                if (sortBy === 'newest') return new Date(b.date || 0) - new Date(a.date || 0);
+                if (sortBy === 'ratingDesc') return b.rating - a.rating;
+                if (sortBy === 'priceDesc') return b.price - a.price;
+                if (sortBy === 'priceAsc') return a.price - b.price;
+                return 0;
+            });
+
+            totalBadge.textContent = `${filtered.length} / ${foodItems.length} 項`;
+            countEl.textContent = `共顯示 ${filtered.length} 道美味餐點紀錄`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                    emptyState.classList.add('flex');
+                }
+                return;
+            } else {
+                if (emptyState) {
+                    emptyState.classList.add('hidden');
+                    emptyState.classList.remove('flex');
+                }
+            }
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
+                    <!-- Image Box -->
+                    <div class="relative h-44 bg-slate-100 overflow-hidden cursor-pointer" onclick="openDetailModal('${escapeHtml(item.id)}')">
+                        <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.src='https://placehold.co/600x400/fff7ed/ea580c?text=GourmetLog'">
+                        <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xs">
+                            ${escapeHtml(item.category)}
+                        </div>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/70 backdrop-blur-md text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]" aria-hidden="true"></i>
+                            <span>${item.rating}</span>
+                        </div>
+                    </div>
+
+                    <!-- Details Card Content -->
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                            <h3 onclick="openDetailModal('${escapeHtml(item.id)}')" class="font-bold text-slate-900 text-sm sm:text-base leading-snug cursor-pointer hover:text-brand-600 transition-colors line-clamp-1">
+                                ${escapeHtml(item.title)}
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1 line-clamp-1">
+                                <i class="fa-solid fa-location-dot text-brand-500 text-[10px]" aria-hidden="true"></i>
+                                ${escapeHtml(item.location || '未標註地點')}
+                            </p>
+                        </div>
+
+                        <!-- Price & Plus Order Button -->
+                        <div class="pt-2.5 border-t border-slate-50 flex items-center justify-between">
+                            <div>
+                                <p class="text-base sm:text-lg font-black text-slate-900">HK$${parseFloat(item.price).toFixed(1)}</p>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="addToCart('${escapeHtml(item.id)}')" aria-label="加入 ${escapeHtml(item.title)} 至點單" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-90 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-brand-500/20 transition-all cursor-pointer" title="加入點單">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openDetailModal(id) {
+            const item = foodItems.find(i => i.id === id);
+            if (!item) return;
+            activeModalItemId = id;
+
+            document.getElementById('detailTitle').textContent = item.title;
+            document.getElementById('detailPrice').textContent = `HK$${parseFloat(item.price).toFixed(1)}`;
+            document.getElementById('detailLocation').querySelector('span').textContent = item.location || '未標註餐廳地點';
+            document.getElementById('detailCategoryTag').textContent = item.category;
+            document.getElementById('detailImg').src = item.image;
+            document.getElementById('detailNotes').textContent = item.notes || '這次沒有寫下詳細筆記，但這道美味一定令人印象深刻！';
+            document.getElementById('detailDate').textContent = item.date || '未知日期';
+
+            const starsContainer = document.getElementById('detailStars');
+            starsContainer.innerHTML = '';
+            const fullStars = Math.floor(item.rating);
+            const hasHalf = item.rating % 1 >= 0.5;
+            for (let i = 0; i < fullStars; i++) {
+                starsContainer.innerHTML += `<i class="fa-solid fa-star" aria-hidden="true"></i>`;
+            }
+            if (hasHalf) {
+                starsContainer.innerHTML += `<i class="fa-solid fa-star-half-stroke" aria-hidden="true"></i>`;
+            }
+            starsContainer.innerHTML += `<span class="text-xs text-slate-600 ml-1 font-bold">(${item.rating})</span>`;
+
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('detailModalCard').classList.remove('scale-95');
+                trapFocus(modal);
+            }, 10);
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detailModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            document.getElementById('detailModalCard').classList.add('scale-95');
+            releaseFocusTrap();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                activeModalItemId = null;
+            }, 200);
+        }
+
+        function openAddModal(editItem = null) {
+            const modal = document.getElementById('addModal');
+            const form = document.getElementById('foodForm');
+            form.reset();
+
+            if (editItem) {
+                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-brand-600" aria-hidden="true"></i> 編輯美食記錄`;
+                document.getElementById('editingItemId').value = editItem.id;
+                document.getElementById('inputTitle').value = editItem.title;
+                document.getElementById('inputCategory').value = editItem.category;
+                document.getElementById('inputPrice').value = editItem.price;
+                document.getElementById('inputLocation').value = editItem.location || '';
+                document.getElementById('inputNotes').value = editItem.notes || '';
+                setRating(editItem.rating);
+
+                if (editItem.image) {
+                    document.getElementById('imagePreview').src = editItem.image;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('imagePlaceholder').classList.add('hidden');
+                }
+            } else {
+                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> 新增美食點餐紀錄`;
+                document.getElementById('editingItemId').value = '';
+                document.getElementById('imagePreview').classList.add('hidden');
+                document.getElementById('imagePlaceholder').classList.remove('hidden');
+                setRating(5);
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('addModalCard').classList.remove('scale-95');
+                trapFocus(modal);
+            }, 10);
+        }
+
+        function closeAddModal() {
+            const modal = document.getElementById('addModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            document.getElementById('addModalCard').classList.add('scale-95');
+            releaseFocusTrap();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function setRating(val) {
+            currentRatingInput = val;
+            document.getElementById('ratingText').textContent = `${val}.0 ★`;
+            const stars = document.querySelectorAll('#starPicker .star-btn');
+            stars.forEach(star => {
+                const sVal = parseInt(star.getAttribute('data-value'));
+                if (sVal <= val) {
+                    star.classList.remove('text-slate-300');
+                    star.classList.add('text-amber-400');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-slate-300');
+                }
+            });
+        }
+
+        function previewAndCompressImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast('圖片壓縮處理中...', false);
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDimension = 800;
+
+                    if (width > height) {
+                        if (width > maxDimension) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        }
+                    } else {
+                        if (height > maxDimension) {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+
+                    const previewImg = document.getElementById('imagePreview');
+                    previewImg.src = compressedBase64;
+                    previewImg.classList.remove('hidden');
+                    document.getElementById('imagePlaceholder').classList.add('hidden');
+                    showToast('照片最佳化完成！');
+                };
+            };
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editingItemId').value;
+            const title = document.getElementById('inputTitle').value.trim();
+            const category = document.getElementById('inputCategory').value;
+            const rawPrice = parseFloat(document.getElementById('inputPrice').value);
+            const location = document.getElementById('inputLocation').value.trim();
+            const notes = document.getElementById('inputNotes').value.trim();
+            const previewSrc = document.getElementById('imagePreview').src;
+
+            if (!title) {
+                showToast('請輸入有效的食品名稱！', true);
+                return;
+            }
+            if (isNaN(rawPrice) || rawPrice < 0) {
+                showToast('請輸入合理的價格 (不可低於 0)！', true);
+                return;
+            }
+            const price = rawPrice;
+
+            const image = (previewSrc && !previewSrc.endsWith('index.html')) 
+                ? previewSrc 
+                : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80';
+
+            if (editId) {
+                const index = foodItems.findIndex(i => i.id === editId);
+                if (index !== -1) {
+                    foodItems[index] = {
+                        ...foodItems[index],
+                        title, category, price, location, notes, image,
+                        rating: currentRatingInput
+                    };
+                    showToast('美食紀錄已更新！');
+                }
+            } else {
+                const newItem = {
+                    id: Date.now().toString(),
+                    title,
+                    category,
+                    price,
+                    location,
+                    notes,
+                    image,
+                    rating: currentRatingInput,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                foodItems.unshift(newItem);
+                showToast('成功新增一道美食記錄！');
+            }
+
+            saveItems();
+            closeAddModal();
+            renderCategories();
+            renderMenu();
+        }
+
+        function addToCart(id) {
+            const item = foodItems.find(i => i.id === id);
+            if (!item) return;
+
+            const existingIdx = cart.findIndex(c => c.id === id);
+            if (existingIdx !== -1) {
+                cart[existingIdx].qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+
+            updateCartUI();
+            showToast(`已將「${item.title}」加入菜單`);
+        }
+
+        function updateCartItemQty(idx, delta) {
+            if (cart[idx]) {
+                cart[idx].qty += delta;
+                if (cart[idx].qty <= 0) {
+                    cart.splice(idx, 1);
+                }
+                updateCartUI();
+            }
+        }
+
+        function addToCartFromModal() {
+            if (activeModalItemId) {
+                addToCart(activeModalItemId);
+                closeDetailModal();
+            }
+        }
+
+        function updateCartUI() {
+            const floatingBadge = document.getElementById('floatingCartBadge');
+            const cartList = document.getElementById('cartList');
+            const cartTotal = document.getElementById('cartTotal');
+
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (totalCount > 0) {
+                floatingBadge.textContent = totalCount;
+                floatingBadge.classList.remove('hidden');
+            } else {
+                floatingBadge.classList.add('hidden');
+            }
+
+            let total = 0;
+            if (cart.length === 0) {
+                cartList.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 space-y-2">
+                        <i class="fa-solid fa-basket-shopping text-3xl" aria-hidden="true"></i>
+                        <p class="text-xs font-semibold">點單內暫時沒有餐點，按卡片上的「+」加點想吃的美味吧！</p>
+                    </div>
+                `;
+            } else {
+                cartList.innerHTML = cart.map((item, idx) => {
+                    const itemTotal = parseFloat(item.price) * item.qty;
+                    total += itemTotal;
+                    return `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                                <img src="${escapeHtml(item.image)}" class="w-12 h-12 rounded-xl object-cover shrink-0" onerror="this.src='https://placehold.co/100x100'">
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs text-slate-900 truncate">${escapeHtml(item.title)}</h4>
+                                    <span class="text-[11px] font-semibold text-slate-400">HK$${parseFloat(item.price).toFixed(1)}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <div class="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden text-xs">
+                                    <button onclick="updateCartItemQty(${idx}, -1)" aria-label="減少數量" class="px-2 py-1 text-slate-600 hover:bg-slate-100 font-bold cursor-pointer">-</button>
+                                    <span class="px-2 font-black text-slate-800">${item.qty}</span>
+                                    <button onclick="updateCartItemQty(${idx}, 1)" aria-label="增加數量" class="px-2 py-1 text-slate-600 hover:bg-slate-100 font-bold cursor-pointer">+</button>
+                                </div>
+                                <button onclick="removeFromCart(${idx})" aria-label="移除餐點" class="text-slate-400 hover:text-red-500 p-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-trash-can text-xs" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            cartTotal.textContent = `HK$${total.toFixed(1)}`;
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            updateCartUI();
+        }
+
+        function showConfirmDialog(title, msg, actionFn) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMsg').textContent = msg;
+            pendingConfirmAction = actionFn;
+
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+                trapFocus(modal);
+            }, 10);
+        }
+
+        function closeConfirmModal(executed = false) {
+            const modal = document.getElementById('confirmModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            releaseFocusTrap();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (!executed) pendingConfirmAction = null;
+            }, 200);
+        }
+
+        function executeConfirmAction() {
+            if (typeof pendingConfirmAction === 'function') {
+                const action = pendingConfirmAction;
+                pendingConfirmAction = null;
+                closeConfirmModal(true);
+                action();
+            }
+        }
+
+        function clearCart() {
+            if (cart.length === 0) {
+                showToast('菜單原本就是空的');
+                return;
+            }
+            showConfirmDialog('確定要清空菜單嗎？', '這將會移除目前購物車內的所有點單。', () => {
+                cart = [];
+                updateCartUI();
+                showToast('已清空菜單');
+            });
+        }
+
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            if (drawer.classList.contains('hidden') || drawer.classList.contains('translate-x-full')) {
+                openCartDrawer();
+            } else {
+                closeCartDrawer();
+            }
+        }
+
+        function openCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            drawer.classList.remove('hidden');
+            drawer.setAttribute('aria-hidden', 'false');
+            setTimeout(() => {
+                drawer.classList.remove('translate-x-full');
+                trapFocus(drawer);
+            }, 10);
+        }
+
+        function closeCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            if (!drawer.classList.contains('translate-x-full')) {
+                drawer.classList.add('translate-x-full');
+                drawer.setAttribute('aria-hidden', 'true');
+                releaseFocusTrap();
+                setTimeout(() => {
+                    drawer.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function showOrderSuccessToast() {
+            if (cart.length === 0) {
+                showToast('菜單內暫時沒有項目哦！', true);
+                return;
+            }
+            closeCartDrawer();
+            showToast('🎉 點單成功！預祝你今天用餐愉快！');
+            cart = [];
+            updateCartUI();
+        }
+
+        function deleteItemFromModal() {
+            if (!activeModalItemId) return;
+            showConfirmDialog('確定要刪除這筆美食紀錄？', '刪除後該食品將無法救回。', () => {
+                foodItems = foodItems.filter(i => i.id !== activeModalItemId);
+                saveItems();
+                closeDetailModal();
+                renderCategories();
+                renderMenu();
+                showToast('已刪除該美食紀錄');
+            });
+        }
+
+        function editCurrentItem() {
+            if (!activeModalItemId) return;
+            const item = foodItems.find(i => i.id === activeModalItemId);
+            closeDetailModal();
+            if (item) {
+                openAddModal(item);
+            }
+        }
+
+        function pickRandomFood() {
+            if (foodItems.length === 0) {
+                showToast('未有食物記錄，請先點擊新增吧！', true);
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * foodItems.length);
+            const picked = foodItems[randomIndex];
+            openDetailModal(picked.id);
+            showToast(`🎲 今天就吃這個吧：${picked.title}！`);
+        }
+
+        function handleSearch() {
+            renderMenu();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            renderMenu();
+        }
+
+        function toggleStatsModal() {
+            const modal = document.getElementById('statsModal');
+            if (modal.classList.contains('hidden')) {
+                const totalItems = foodItems.length;
+                const totalPrice = foodItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+                const avgPrice = totalItems > 0 ? (totalPrice / totalItems).toFixed(1) : 0;
+
+                document.getElementById('statTotalItems').textContent = totalItems;
+                document.getElementById('statAvgPrice').textContent = `HK$${avgPrice}`;
+
+                const catCounts = {};
+                foodItems.forEach(i => {
+                    catCounts[i.category] = (catCounts[i.category] || 0) + 1;
+                });
+
+                const breakdownContainer = document.getElementById('categoryBreakdown');
+                breakdownContainer.innerHTML = Object.keys(catCounts).map(cat => {
+                    const count = catCounts[cat];
+                    const pct = totalItems > 0 ? Math.round((count / totalItems) * 100) : 0;
+                    return `
+                        <div>
+                            <div class="flex justify-between font-bold text-slate-700 mb-1">
+                                <span>${escapeHtml(cat)}</span>
+                                <span class="text-brand-600">${count} 項 (${pct}%)</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-brand-500 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    trapFocus(modal);
+                }, 10);
+            } else {
+                closeStatsModal();
+            }
+        }
+
+        function closeStatsModal() {
+            const modal = document.getElementById('statsModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function toggleDataModal() {
+            const modal = document.getElementById('dataModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    trapFocus(modal);
+                }, 10);
+            } else {
+                closeDataModal();
+            }
+        }
+
+        function closeDataModal() {
+            const modal = document.getElementById('dataModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function exportMenuPDF() {
+            if (foodItems.length === 0) {
+                showToast('目前未有任何食品紀錄可供匯出餐牌', true);
+                return;
+            }
+
+            const printContainer = document.getElementById('printableMenu');
+            const previewContainer = document.getElementById('menuPreviewContent');
+            const todayStr = new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const categoryOrder = ['主食', '特飲', '甜品', '小食'];
+            const grouped = {};
+            
+            foodItems.forEach(item => {
+                const cat = item.category || '其它';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(item);
+            });
+
+            const allCats = Array.from(new Set([...categoryOrder, ...Object.keys(grouped)]));
+
+            let categoryHtml = '';
+
+            allCats.forEach(cat => {
+                const items = grouped[cat];
+                if (!items || items.length === 0) return;
+
+                const itemsHtml = items.map(item => {
+                    const starsStr = '★'.repeat(Math.floor(item.rating)) + (item.rating % 1 >= 0.5 ? '½' : '');
+                    return `
+                        <div class="menu-page-break-avoid mb-4 p-3 border-b border-slate-200 flex items-start gap-4">
+                            <img src="${escapeHtml(item.image)}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex items-baseline justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-black text-slate-900 text-base">${escapeHtml(item.title)}</span>
+                                        <span class="text-amber-500 text-xs font-bold">${starsStr}</span>
+                                    </div>
+                                    <div class="leader-dots hidden sm:block"></div>
+                                    <span class="font-black text-brand-700 text-base shrink-0">HK$${parseFloat(item.price).toFixed(1)}</span>
+                                </div>
+                                <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+                                    ${item.location ? `<span><i class="fa-solid fa-location-dot text-slate-400" aria-hidden="true"></i> ${escapeHtml(item.location)}</span>` : ''}
+                                </div>
+                                ${item.notes ? `<p class="text-xs text-slate-600 italic mt-1.5 bg-slate-50 p-2 rounded-lg border border-slate-100">${escapeHtml(item.notes)}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                categoryHtml += `
+                    <div class="menu-page-break-avoid mb-6">
+                        <div class="flex items-center gap-3 mb-3 border-b-2 border-slate-900 pb-1">
+                            <h3 class="text-lg font-black text-slate-900 tracking-wide">${escapeHtml(cat)}</h3>
+                            <span class="text-xs font-bold text-slate-500">(${items.length}款精選)</span>
+                        </div>
+                        <div class="space-y-1">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            const fullMenuHtml = `
+                <div class="border-4 border-slate-900 p-6 sm:p-8 bg-white text-slate-900 shadow-none">
+                    <!-- Menu Header -->
+                    <div class="text-center border-b-2 border-slate-900 pb-6 mb-6">
+                        <p class="text-xs font-bold tracking-widest text-brand-600 uppercase mb-1">GourmetLog 美食秘菜單 ‧ 典藏食譜</p>
+                        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">${escapeHtml(restaurantName)}</h1>
+                        <p class="text-xs text-slate-500 font-semibold mt-2">印製日期：${todayStr} ｜ 專屬私人美食紀錄與推薦菜單</p>
+                    </div>
+
+                    <!-- Menu Content Grid -->
+                    <div class="space-y-6">
+                        ${categoryHtml}
+                    </div>
+
+                    <!-- Menu Footer -->
+                    <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-400 font-medium">
+                        <span>GourmetLog 美食秘菜單系統 自動生成</span>
+                        <span>${escapeHtml(restaurantName)} ‧ 私人推薦餐牌</span>
+                    </div>
+                </div>
+            `;
+
+            printContainer.innerHTML = fullMenuHtml;
+            previewContainer.innerHTML = fullMenuHtml;
+
+            closeDataModal();
+            openMenuPreviewModal();
+        }
+
+        function openMenuPreviewModal() {
+            const modal = document.getElementById('menuPreviewModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                trapFocus(modal);
+            }, 10);
+        }
+
+        function closeMenuPreviewModal() {
+            const modal = document.getElementById('menuPreviewModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function triggerPrint() {
+            try {
+                window.print();
+            } catch (err) {
+                showToast('瀏覽器限制直接列印，請點擊「新頁面列印」按鈕', true);
+            }
+        }
+
+        function openPrintInNewWindow() {
+            const printContent = document.getElementById('printableMenu').innerHTML;
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                showToast('彈出式視窗被瀏覽器封鎖，請允許彈出視窗後重試', true);
+                return;
+            }
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="zh-HK">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${escapeHtml(restaurantName)} - 餐廳餐牌</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Noto Sans TC', sans-serif; background: #ffffff; color: #000; padding: 20px; }
+                        .leader-dots { flex-grow: 1; border-bottom: 2px dotted #94a3b8; margin: 0 12px; position: relative; top: -4px; }
+                        .menu-page-break-avoid { break-inside: avoid; page-break-inside: avoid; }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 400);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        async function exportData() {
+            if (!foodItems || foodItems.length === 0) {
+                showToast('目前沒有資料可供匯出', true);
+                return;
+            }
+
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const dateStr = new Date().toISOString().split('T')[0];
+            const filename = `GourmetLog_Backup_${dateStr}.json`;
+            const jsonString = JSON.stringify(foodItems, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const file = new File([blob], filename, { type: 'application/json' });
+
+            // 1. 嘗試使用 Web Share API (針對 iOS 只傳送 { files: [file] }，防止產生額外的文字檔)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    const shareData = { files: [file] };
+                    if (!isIOS) {
+                        shareData.title = 'GourmetLog 備份';
+                    }
+                    await navigator.share(shareData);
+                    showToast('請選「儲存到檔案」');
+                    return;
+                } catch (err) {
+                    // 使用者在分享選單中點擊取消 (AbortError) 時直接靜默結束
+                    if (err.name === 'AbortError') {
+                        return;
+                    }
+                }
+            }
+
+            // 2. iOS 若不支援或未能完成 Web Share，則後備複製 JSON 至剪貼簿（iOS 嚴禁執行 <a download>）
+            if (isIOS) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(jsonString);
+                        showToast('已複製 JSON！請貼至備忘錄或檔案 App 存成 .json');
+                        return;
+                    } catch (e) {
+                        // 複製失敗
+                    }
+                }
+                showToast('無法自動匯出，請複製資料後手動備份', true);
+                return;
+            }
+
+            // 3. 桌面端 / 非 iOS 標準瀏覽器使用 Blob URL 下載
+            try {
+                const url = URL.createObjectURL(blob);
+                const dlAnchor = document.createElement('a');
+                dlAnchor.href = url;
+                dlAnchor.download = filename;
+                document.body.appendChild(dlAnchor);
+                dlAnchor.click();
+                document.body.removeChild(dlAnchor);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast('已匯出 JSON 備份檔案');
+            } catch (err) {
+                showToast('匯出失敗，請重試或改用電腦開版', true);
+            }
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        foodItems = imported;
+                        saveItems();
+                        renderCategories();
+                        renderMenu();
+                        closeDataModal();
+                        showToast('成功匯入美食備份紀錄！');
+                    } else {
+                        showToast('檔案格式有誤', true);
+                    }
+                } catch (err) {
+                    showToast('解析 JSON 檔案失敗', true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetToSampleData() {
+            showConfirmDialog('確定重置為預設範例菜單？', '這將會覆蓋你目前的紀錄並回復範例資料。', () => {
+                foodItems = [...defaultFoodItems];
+                saveItems();
+                renderCategories();
+                renderMenu();
+                closeDataModal();
+                showToast('已重置為預設美食範例數據');
+            });
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (toastTimer) {
+                clearTimeout(toastTimer);
+                toastTimer = null;
+            }
+
+            toastMsg.textContent = msg;
+            if (isError) {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-amber-400 text-base';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base';
+            }
+
+            toast.classList.remove('-translate-y-12', 'translate-y-20', 'opacity-0');
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0');
+                toastTimer = null;
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
