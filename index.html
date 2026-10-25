@@ -102,6 +102,17 @@
     <!-- Welcome / Start Ordering Splash Screen -->
     <div id="welcomeScreen" role="dialog" aria-modal="true" aria-label="點餐系統歡迎畫面" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center text-white transition-all duration-500">
         <div class="max-w-md w-full bg-slate-900/80 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md flex flex-col items-center space-y-6">
+            
+            <!-- Language Switcher Pill on Start Screen -->
+            <div class="flex items-center gap-1 bg-slate-800/90 p-1 rounded-2xl border border-slate-700/80 text-xs font-bold w-full justify-center">
+                <button onclick="setLanguage('zh')" id="welcomeLangZh" class="flex-1 py-1.5 px-3 rounded-xl transition-all cursor-pointer">
+                    繁體中文
+                </button>
+                <button onclick="setLanguage('en')" id="welcomeLangEn" class="flex-1 py-1.5 px-3 rounded-xl transition-all cursor-pointer">
+                    English
+                </button>
+            </div>
+
             <!-- Restaurant Badge / Logo -->
             <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-brand-500/30 glow-effect">
                 <i class="fa-solid fa-utensils" aria-hidden="true"></i>
@@ -109,19 +120,19 @@
 
             <!-- Title & Subtitle -->
             <div class="space-y-2">
-                <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-widest">自助點餐 & 美食紀錄系統</span>
+                <span id="welcomeBadge" class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-widest">自助點餐 & 美食紀錄系統</span>
                 <h1 id="welcomeRestaurantTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">荃港大冰室</h1>
-                <p class="text-xs sm:text-sm text-slate-400 font-medium">歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食</p>
+                <p id="welcomeSubtitle" class="text-xs sm:text-sm text-slate-400 font-medium">歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食</p>
             </div>
 
             <!-- Table Number / Mode Selector -->
             <div class="w-full bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs font-semibold text-slate-300">
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-chair text-amber-400" aria-hidden="true"></i> 用餐型態</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-chair text-amber-400" aria-hidden="true"></i> <span id="welcomeDiningLabel">用餐型態</span></span>
                 <span id="welcomeTableTag" class="bg-brand-600 text-white px-2.5 py-1 rounded-lg font-bold">堂食 / A-08 桌</span>
             </div>
 
             <!-- Big Start Ordering Button -->
-            <button onclick="startOrdering()" aria-label="開始點餐" class="w-full py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer">
+            <button onclick="startOrdering()" id="welcomeStartBtn" aria-label="開始點餐" class="w-full py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer">
                 <span>開始點餐</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
             </button>
@@ -140,9 +151,9 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
                         <h1 id="appHeaderTitle" class="text-base sm:text-lg font-black text-slate-900 leading-none truncate">荃港大冰室</h1>
-                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200/60 hidden sm:inline-block shrink-0">秘菜單 ‧ 美食誌</span>
+                        <span id="appHeaderBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200/60 hidden sm:inline-block shrink-0">秘菜單 ‧ 美食誌</span>
                     </div>
-                    <p class="text-[11px] text-slate-500 font-medium mt-0.5 truncate">個人數位美食紀錄系統</p>
+                    <p id="appHeaderSubtitle" class="text-[11px] text-slate-500 font-medium mt-0.5 truncate">個人數位美食紀錄系統</p>
                 </div>
             </div>
 
@@ -159,15 +170,21 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <!-- Header Language Switcher Button -->
+                <button onclick="toggleLanguage()" id="headerLangBtn" class="px-2.5 py-1.5 text-slate-700 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer text-xs font-extrabold border border-slate-200 flex items-center gap-1" title="切換介面語言 / Switch Language">
+                    <i class="fa-solid fa-globe text-brand-600" aria-hidden="true"></i>
+                    <span id="headerLangText">EN</span>
+                </button>
+
                 <button onclick="showWelcomeScreen()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="回到點餐歡迎頁面" aria-label="回到點餐歡迎頁面">
                     <i class="fa-solid fa-house text-base sm:text-lg" aria-hidden="true"></i>
                 </button>
 
                 <button onclick="openAddModal()" aria-label="新增美食記錄" class="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm shadow-brand-500/20 transition-all duration-150 cursor-pointer">
                     <i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
-                    <span class="hidden sm:inline">新增美食記錄</span>
-                    <span class="sm:hidden">紀錄</span>
+                    <span id="headerAddBtnText" class="hidden sm:inline">新增美食記錄</span>
+                    <span id="headerAddBtnTextShort" class="sm:hidden">紀錄</span>
                 </button>
 
                 <button onclick="toggleStatsModal()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="食評與數據統計" aria-label="查看食評與數據統計">
@@ -198,7 +215,7 @@
             <!-- Category Menu Navigation -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                 <div class="flex items-center justify-between mb-3 px-1">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
+                    <h2 id="sidebarCatHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
                     <span id="totalItemsBadge" class="text-[11px] font-extrabold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0 項</span>
                 </div>
                 <nav class="flex md:flex-col gap-1.5 overflow-x-auto hide-scrollbar pb-1 md:pb-0" id="categoryNav">
@@ -206,21 +223,21 @@
                 </nav>
             </div>
 
-            <!-- Sorting & Quick Filters (Mobile & Desktop Accessible) -->
+            <!-- Sorting & Quick Filters -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">排序與精選</h2>
+                <h2 id="sidebarFilterHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">排序與精選</h2>
                 <div>
-                    <label for="sortBy" class="block text-xs font-semibold text-slate-600 mb-1.5">排序方式</label>
+                    <label id="sortByLabel" for="sortBy" class="block text-xs font-semibold text-slate-600 mb-1.5">排序方式</label>
                     <select id="sortBy" onchange="renderMenu()" aria-label="選擇美食排序方式" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-brand-500">
-                        <option value="newest">最新紀錄優先</option>
-                        <option value="ratingDesc">美味評分最高 (5★ → 1★)</option>
-                        <option value="priceDesc">價格高至低</option>
-                        <option value="priceAsc">價格低至高</option>
+                        <option value="newest" id="sortOptNewest">最新紀錄優先</option>
+                        <option value="ratingDesc" id="sortOptRating">美味評分最高 (5★ → 1★)</option>
+                        <option value="priceDesc" id="sortOptPriceDesc">價格高至低</option>
+                        <option value="priceAsc" id="sortOptPriceAsc">價格低至高</option>
                     </select>
                 </div>
 
                 <div class="pt-2 border-t border-slate-100">
-                    <label class="block text-xs font-semibold text-slate-600 mb-2">快速評分篩選</label>
+                    <label id="ratingFilterLabel" class="block text-xs font-semibold text-slate-600 mb-2">快速評分篩選</label>
                     <div class="flex flex-wrap gap-1.5" id="ratingFilterButtons">
                         <button onclick="setRatingFilter(0)" id="rf-0" aria-label="篩選全部評分" class="rf-btn px-2.5 py-1 text-xs font-bold rounded-lg bg-brand-600 text-white cursor-pointer">全部</button>
                         <button onclick="setRatingFilter(5)" id="rf-5" aria-label="僅顯示 5 星必吃美食" class="rf-btn px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 cursor-pointer">5★ 必吃</button>
@@ -244,7 +261,7 @@
                 <!-- Random Pick Button for indecisive eaters -->
                 <button onclick="pickRandomFood()" aria-label="是日推介隨機抽選美食" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-500/30 flex items-center gap-2 transition-all cursor-pointer">
                     <i class="fa-solid fa-dice text-sm" aria-hidden="true"></i>
-                    <span>是日推介</span>
+                    <span id="randomPickBtnText">是日推介</span>
                 </button>
             </div>
 
@@ -259,17 +276,17 @@
                     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="font-bold text-slate-800 text-base">暫無相關美食紀錄</h3>
-                    <p class="text-xs text-slate-400">點擊右上方「新增美食記錄」來加入第一道料理吧！</p>
+                    <h3 id="emptyStateTitle" class="font-bold text-slate-800 text-base">暫無相關美食紀錄</h3>
+                    <p id="emptyStateSub" class="text-xs text-slate-400">點擊右上方「新增美食記錄」來加入第一道料理吧！</p>
                 </div>
                 <button onclick="openAddModal()" aria-label="新增紀錄" class="mt-2 px-4 py-2 bg-brand-600 text-white font-bold text-xs rounded-xl hover:bg-brand-700 transition-all cursor-pointer">
-                    <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> 新增紀錄
+                    <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> <span id="emptyStateBtnText">新增紀錄</span>
                 </button>
             </div>
         </section>
     </main>
 
-    <!-- Floating Cart Button (Bottom-Right elevated for Netlify Badge clearance) -->
+    <!-- Floating Cart Button -->
     <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-24 right-5 sm:right-6 z-[90] w-14 h-14 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
         <i class="fa-solid fa-cart-shopping text-xl sm:text-2xl" aria-hidden="true"></i>
         <span id="floatingCartBadge" class="hidden absolute -top-1 -right-1 bg-amber-400 text-slate-900 font-black text-xs sm:text-sm w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 border-white shadow-md">0</span>
@@ -280,7 +297,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
             <div class="flex items-center gap-2.5">
                 <i class="fa-solid fa-receipt text-amber-400 text-lg" aria-hidden="true"></i>
-                <h3 class="font-bold text-base">今日點單清單</h3>
+                <h3 id="cartDrawerTitle" class="font-bold text-base">今日點單清單</h3>
             </div>
             <button onclick="toggleCartDrawer()" aria-label="關閉購物車" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer">
                 <i class="fa-solid fa-xmark text-xl" aria-hidden="true"></i>
@@ -291,17 +308,16 @@
             <!-- Cart items injected dynamically -->
         </div>
 
-        <!-- Elevated bottom action area to clear Netlify footer badge -->
         <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 space-y-3 pb-28 sm:pb-24">
             <div class="flex justify-between items-center text-sm">
-                <span class="font-bold text-slate-600">總計預算金額</span>
+                <span id="cartTotalLabel" class="font-bold text-slate-600">總計預算金額</span>
                 <span id="cartTotal" class="text-xl font-black text-brand-600">HK$0.0</span>
             </div>
             <div class="grid grid-cols-2 gap-2.5">
-                <button onclick="clearCart()" aria-label="清空菜單" class="py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                <button onclick="clearCart()" id="clearCartBtn" aria-label="清空菜單" class="py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
                     清空菜單
                 </button>
-                <button onclick="showOrderSuccessToast()" aria-label="確認送出點單" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">
+                <button onclick="showOrderSuccessToast()" id="confirmOrderBtn" aria-label="確認送出點單" class="py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">
                     確認送出點單
                 </button>
             </div>
@@ -336,7 +352,7 @@
 
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1.5">
                     <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase">
-                        <span>美食筆記與心得</span>
+                        <span id="detailNotesHeader">美食筆記與心得</span>
                         <span id="detailDate"></span>
                     </div>
                     <p id="detailNotes" class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line"></p>
@@ -344,14 +360,14 @@
             </div>
 
             <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
-                <button onclick="deleteItemFromModal()" aria-label="刪除此紀錄" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                <button onclick="deleteItemFromModal()" id="detailDeleteBtn" aria-label="刪除此紀錄" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all cursor-pointer">
                     <i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> 刪除此紀錄
                 </button>
                 <div class="flex gap-2">
-                    <button onclick="editCurrentItem()" aria-label="編輯紀錄" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
+                    <button onclick="editCurrentItem()" id="detailEditBtn" aria-label="編輯紀錄" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
                         <i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> 編輯
                     </button>
-                    <button onclick="addToCartFromModal()" aria-label="加入點單" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer">
+                    <button onclick="addToCartFromModal()" id="detailAddToCartBtn" aria-label="加入點單" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer">
                         <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> 加入點單
                     </button>
                 </div>
@@ -376,14 +392,14 @@
 
                 <!-- Image Upload & Camera Capture -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">相片 (拍照 / 相冊選擇)</label>
+                    <label id="labelPhoto" class="block text-xs font-bold text-slate-700 mb-1.5">相片 (拍照 / 相冊選擇)</label>
                     <div class="relative h-36 bg-slate-50 border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden group">
                         <input type="file" accept="image/*" onchange="previewAndCompressImage(event)" aria-label="上載相片" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                         <img id="imagePreview" alt="相片預覽" class="hidden absolute inset-0 w-full h-full object-cover">
                         <div id="imagePlaceholder" class="text-center space-y-1">
                             <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-brand-500 transition-colors" aria-hidden="true"></i>
-                            <p class="text-xs font-semibold text-slate-500">點擊拍照或上載食品相片</p>
-                            <p class="text-[10px] text-slate-400">（系統將自動智慧壓縮相片）</p>
+                            <p id="photoPlaceholderText" class="text-xs font-semibold text-slate-500">點擊拍照或上載食品相片</p>
+                            <p id="photoSubText" class="text-[10px] text-slate-400">（系統將自動智慧壓縮相片）</p>
                         </div>
                     </div>
                 </div>
@@ -391,16 +407,16 @@
                 <!-- Title & Category -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="inputTitle" class="block text-xs font-bold text-slate-700 mb-1">食品名稱 *</label>
+                        <label id="labelTitle" for="inputTitle" class="block text-xs font-bold text-slate-700 mb-1">食品名稱 *</label>
                         <input type="text" id="inputTitle" required placeholder="例如：黑豚叉燒拉麵" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
-                        <label for="inputCategory" class="block text-xs font-bold text-slate-700 mb-1">類別 *</label>
+                        <label id="labelCategory" for="inputCategory" class="block text-xs font-bold text-slate-700 mb-1">類別 *</label>
                         <select id="inputCategory" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
-                            <option value="主食">主食</option>
-                            <option value="特飲">特飲</option>
-                            <option value="甜品">甜品</option>
-                            <option value="小食">小食</option>
+                            <option value="主食" id="optMains">主食</option>
+                            <option value="特飲" id="optDrinks">特飲</option>
+                            <option value="甜品" id="optDesserts">甜品</option>
+                            <option value="小食" id="optSnacks">小食</option>
                         </select>
                     </div>
                 </div>
@@ -408,11 +424,11 @@
                 <!-- Price & Location -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="inputPrice" class="block text-xs font-bold text-slate-700 mb-1">價格 (HK$) *</label>
+                        <label id="labelPrice" for="inputPrice" class="block text-xs font-bold text-slate-700 mb-1">價格 (HK$) *</label>
                         <input type="number" id="inputPrice" step="0.1" min="0" required placeholder="88.0" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
                     </div>
                     <div>
-                        <label for="inputLocation" class="block text-xs font-bold text-slate-700 mb-1">餐廳/地點</label>
+                        <label id="labelLocation" for="inputLocation" class="block text-xs font-bold text-slate-700 mb-1">餐廳/地點</label>
                         <input type="text" id="inputLocation" placeholder="例如：銅鑼灣" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-brand-500">
                     </div>
                 </div>
@@ -420,7 +436,7 @@
                 <!-- Star Rating Picker -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-bold text-slate-700">美味星級評分</label>
+                        <label id="labelRating" class="text-xs font-bold text-slate-700">美味星級評分</label>
                         <span id="ratingText" class="text-xs font-black text-amber-500">5.0 ★</span>
                     </div>
                     <div id="starPicker" class="flex gap-2">
@@ -434,13 +450,13 @@
 
                 <!-- Food Notes -->
                 <div>
-                    <label for="inputNotes" class="block text-xs font-bold text-slate-700 mb-1">美食筆記 / 心得短評</label>
+                    <label id="labelNotes" for="inputNotes" class="block text-xs font-bold text-slate-700 mb-1">美食筆記 / 心得短評</label>
                     <textarea id="inputNotes" rows="2" placeholder="記下湯底濃郁度、配料建議或再訪指數..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-brand-500"></textarea>
                 </div>
 
                 <div class="pt-2 flex gap-2">
-                    <button type="button" onclick="closeAddModal()" class="w-1/3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">取消</button>
-                    <button type="submit" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">儲存美食紀錄</button>
+                    <button type="button" onclick="closeAddModal()" id="btnFormCancel" class="w-1/3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">取消</button>
+                    <button type="submit" id="btnFormSave" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">儲存美食紀錄</button>
                 </div>
             </form>
         </div>
@@ -450,7 +466,7 @@
     <div id="statsModal" role="dialog" aria-modal="true" aria-label="美食數據與消費統計" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                <h3 id="statsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> 美食數據與消費統計
                 </h3>
                 <button onclick="toggleStatsModal()" aria-label="關閉統計" class="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -460,23 +476,23 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-brand-50 p-4 rounded-2xl border border-brand-100 text-center">
-                    <span class="text-[10px] font-bold text-brand-600 uppercase">總紀錄食品</span>
+                    <span id="statTotalItemsLabel" class="text-[10px] font-bold text-brand-600 uppercase">總紀錄食品</span>
                     <p id="statTotalItems" class="text-2xl font-black text-brand-700 mt-1">0</p>
                 </div>
                 <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 text-center">
-                    <span class="text-[10px] font-bold text-amber-600 uppercase">平均餐點單價</span>
+                    <span id="statAvgPriceLabel" class="text-[10px] font-bold text-amber-600 uppercase">平均餐點單價</span>
                     <p id="statAvgPrice" class="text-2xl font-black text-amber-700 mt-1">HK$0.0</p>
                 </div>
             </div>
 
             <div class="space-y-2">
-                <h4 class="text-xs font-bold text-slate-700">類別分佈</h4>
+                <h4 id="statBreakdownLabel" class="text-xs font-bold text-slate-700">類別分佈</h4>
                 <div id="categoryBreakdown" class="space-y-2 text-xs">
                     <!-- Category stats injected dynamically -->
                 </div>
             </div>
 
-            <button onclick="toggleStatsModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
+            <button onclick="toggleStatsModal()" id="statsCloseBtn" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
                 關閉
             </button>
         </div>
@@ -487,10 +503,10 @@
         <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                    <h3 id="settingsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> 點餐系統設定 & 資料管理
                     </h3>
-                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.6</span>
+                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8</span>
                 </div>
                 <button onclick="toggleDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -498,46 +514,46 @@
             </div>
 
             <div class="space-y-1.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <label for="inputRestaurantName" class="block text-xs font-bold text-slate-700">餐廳/點餐系統名稱</label>
+                <label id="labelRestaurantName" for="inputRestaurantName" class="block text-xs font-bold text-slate-700">餐廳/點餐系統名稱</label>
                 <div class="flex gap-2">
                     <input type="text" id="inputRestaurantName" placeholder="例如：荃港大冰室" 
                         class="flex-1 p-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-brand-500">
-                    <button onclick="saveRestaurantName()" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer">
+                    <button onclick="saveRestaurantName()" id="btnSaveRestName" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer">
                         儲存名稱
                     </button>
                 </div>
             </div>
 
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <p id="backupDescText" class="text-xs text-slate-600 leading-relaxed">
                 你可以隨時備份你的私人美食記錄，或是匯入之前的 JSON 備份檔，避免紀錄因更換手機而流失。
             </p>
 
             <div class="space-y-2 pt-1">
-                <button onclick="exportMenuPDF()" aria-label="匯出或列印餐廳餐牌 PDF" class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-500/20 transition-all cursor-pointer">
-                    <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> 匯出 / 列印專屬餐廳餐牌 (PDF)
+                <button onclick="exportMenuPDF()" id="btnExportPDF" aria-label="匯出或列印餐廳餐牌 PDF" class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-500/20 transition-all cursor-pointer">
+                    <i class="fa-solid fa-file-pdf" aria-hidden="true"></i> <span id="btnExportPDFText">匯出 / 列印專屬餐廳餐牌 (PDF)</span>
                 </button>
                 <div>
-                    <button onclick="exportData()" aria-label="匯出 JSON 備份" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-download text-brand-600" aria-hidden="true"></i> 匯出 JSON 備份檔案
+                    <button onclick="exportData()" id="btnExportJSON" aria-label="匯出 JSON 備份" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <i class="fa-solid fa-download text-brand-600" aria-hidden="true"></i> <span id="btnExportJSONText">匯出 JSON 備份檔案</span>
                     </button>
-                    <p class="text-[11px] text-slate-400 text-center mt-1">iPhone：會開分享選單，請選「儲存到檔案」</p>
+                    <p id="exportIosNote" class="text-[11px] text-slate-400 text-center mt-1">iPhone：會開分享選單，請選「儲存到檔案」</p>
                 </div>
-                <label class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all">
-                    <i class="fa-solid fa-upload text-brand-600" aria-hidden="true"></i> 匯入 JSON 備份檔案
+                <label id="lblImportJSON" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-upload text-brand-600" aria-hidden="true"></i> <span id="lblImportJSONText">匯入 JSON 備份檔案</span>
                     <input type="file" accept=".json" onchange="importData(event)" aria-label="選擇 JSON 備份檔案" class="hidden">
                 </label>
-                <button onclick="resetToSampleData()" aria-label="重置為預設範例菜單" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border border-red-100 cursor-pointer">
-                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> 重置為預設範例菜單
+                <button onclick="resetToSampleData()" id="btnResetSample" aria-label="重置為預設範例菜單" class="w-full py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border border-red-100 cursor-pointer">
+                    <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> <span id="btnResetSampleText">重置為預設範例菜單</span>
                 </button>
             </div>
 
-            <button onclick="toggleDataModal()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
+            <button onclick="toggleDataModal()" id="dataFinishBtn" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer">
                 完成
             </button>
         </div>
     </div>
 
-    <!-- Custom Confirmation Dialog (P1 Protection against accidental deletion) -->
+    <!-- Custom Confirmation Dialog -->
     <div id="confirmModal" role="dialog" aria-modal="true" aria-label="確認對話框" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl text-center space-y-4 transform scale-95 transition-transform duration-200">
             <div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
@@ -548,13 +564,13 @@
                 <p id="confirmModalMsg" class="text-xs text-slate-500 mt-1">這個動作無法復原。</p>
             </div>
             <div class="flex gap-2 pt-1">
-                <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">取消</button>
+                <button onclick="closeConfirmModal(false)" id="confirmModalCancelBtn" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer">取消</button>
                 <button id="confirmModalActionBtn" onclick="executeConfirmAction()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer">確認執行</button>
             </div>
         </div>
     </div>
 
-    <!-- Notification Toast (Top on mobile to clear bottom CTAs; Bottom-right on desktop) -->
+    <!-- Notification Toast -->
     <div id="toast" class="fixed top-4 left-4 right-4 sm:top-auto sm:bottom-24 sm:left-auto sm:right-6 z-[110] bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform -translate-y-12 sm:translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base" aria-hidden="true"></i>
         <span id="toastMsg" class="text-xs sm:text-sm font-semibold">提示訊息</span>
@@ -571,16 +587,16 @@
                     <i class="fa-solid fa-file-pdf text-lg" aria-hidden="true"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm sm:text-base text-white">專屬餐廳餐牌預覽</h3>
-                    <p class="text-[11px] text-slate-400">請確認餐牌視覺排版，可點擊列印另存為 PDF</p>
+                    <h3 id="pdfPreviewTitle" class="font-bold text-sm sm:text-base text-white">專屬餐廳餐牌預覽</h3>
+                    <p id="pdfPreviewSub" class="text-[11px] text-slate-400">請確認餐牌視覺排版，可點擊列印另存為 PDF</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="triggerPrint()" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
-                    <i class="fa-solid fa-print" aria-hidden="true"></i> 直接列印 / 另存 PDF
+                <button onclick="triggerPrint()" id="pdfDirectPrintBtn" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
+                    <i class="fa-solid fa-print" aria-hidden="true"></i> <span id="pdfDirectPrintText">直接列印 / 另存 PDF</span>
                 </button>
-                <button onclick="openPrintInNewWindow()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-all cursor-pointer" title="在新分頁獨立開啟並列印">
-                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> 新頁面列印
+                <button onclick="openPrintInNewWindow()" id="pdfNewWinBtn" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-all cursor-pointer" title="在新分頁獨立開啟並列印">
+                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> <span id="pdfNewWinText">新頁面列印</span>
                 </button>
                 <button onclick="closeMenuPreviewModal()" aria-label="關閉預覽" class="p-2 text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -604,6 +620,284 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
+        // i18n Translation Dictionary
+        const translations = {
+            zh: {
+                welcome_badge: "自助點餐 & 美食紀錄系統",
+                welcome_sub: "歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食",
+                dining_mode: "用餐型態",
+                table_prefix: "堂食 / {table} 桌",
+                start_ordering: "開始點餐",
+                secret_menu_badge: "秘菜單 ‧ 美食誌",
+                app_subtitle: "個人數位美食紀錄系統",
+                search_placeholder: "搜尋食品、餐廳或心得標籤...",
+                add_record: "新增美食記錄",
+                add_record_short: "紀錄",
+                nav_categories: "點餐類別選單",
+                sort_and_filters: "排序與精選",
+                sort_label: "排序方式",
+                sort_newest: "最新紀錄優先",
+                sort_rating_desc: "美味評分最高 (5★ → 1★)",
+                sort_price_desc: "價格高至低",
+                sort_price_asc: "價格低至高",
+                rating_filter_label: "快速評分篩選",
+                rf_all: "全部",
+                rf_5: "5★ 必吃",
+                rf_4: "4★+ 推薦",
+                cat_all: "全部",
+                cat_mains: "主食",
+                cat_drinks: "特飲",
+                cat_desserts: "甜品",
+                cat_snacks: "小食",
+                all_dishes_title: "全部食品",
+                category_dishes_title: "{cat} 菜單",
+                displaying_items: "共顯示 {count} 道美味餐點紀錄",
+                random_pick: "是日推介",
+                random_toast: "🎲 今天就吃這個吧：{title}！",
+                no_items_title: "暫無相關美食紀錄",
+                no_items_sub: "點擊右上方「新增美食記錄」來加入第一道料理吧！",
+                no_items_btn: "新增紀錄",
+                cart_title: "今日點單清單",
+                cart_empty: "點單內暫時沒有餐點，按卡片上的「+」加點想吃的美味吧！",
+                total_budget: "總計預算金額",
+                clear_cart: "清空菜單",
+                confirm_order: "確認送出點單",
+                order_success: "🎉 點單成功！預祝你今天用餐愉快！",
+                add_to_cart: "加入點單",
+                added_to_cart: "已將「{title}」加入菜單",
+                detail_title: "美食詳細資訊",
+                notes_label: "美食筆記與心得",
+                no_notes: "這次沒有寫下詳細筆記，但這道美味一定令人印象深刻！",
+                delete_record: "刪除此紀錄",
+                edit_record: "編輯",
+                add_modal_title: "新增美食點餐紀錄",
+                edit_modal_title: "編輯美食記錄",
+                photo_label: "相片 (拍照 / 相冊選擇)",
+                photo_placeholder: "點擊拍照或上載食品相片",
+                photo_sub: "（系統將自動智慧壓縮相片）",
+                title_label: "食品名稱 *",
+                category_label: "類別 *",
+                price_label: "價格 (HK$) *",
+                location_label: "餐廳/地點",
+                location_placeholder: "例如：銅鑼灣",
+                title_placeholder: "例如：黑豚叉燒拉麵",
+                rating_label: "美味星級評分",
+                notes_placeholder: "記下湯底濃郁度、配料建議或再訪指數...",
+                cancel: "取消",
+                save: "儲存美食紀錄",
+                stats_title: "美食數據與消費統計",
+                total_items_stat: "總紀錄食品",
+                avg_price_stat: "平均餐點單價",
+                cat_breakdown: "類別分佈",
+                close: "關閉",
+                settings_title: "點餐系統設定 & 資料管理",
+                restaurant_name_label: "餐廳/點餐系統名稱",
+                save_name: "儲存名稱",
+                backup_desc: "你可以隨時備份你的私人美食記錄，或是匯入之前的 JSON 備份檔，避免紀錄因更換手機而流失。",
+                export_pdf: "匯出 / 列印專屬餐廳餐牌 (PDF)",
+                export_json: "匯出 JSON 備份檔案",
+                export_ios_note: "iPhone：會開分享選單，請選「儲存到檔案」",
+                import_json: "匯入 JSON 備份檔案",
+                reset_sample: "重置為預設範例菜單",
+                finish: "完成",
+                confirm_title: "確定執行此操作？",
+                confirm_msg: "這個動作無法復原。",
+                confirm_exec: "確認執行",
+                pdf_title: "專屬餐廳餐牌預覽",
+                pdf_sub: "請確認餐牌視覺排版，可點擊列印另存為 PDF",
+                direct_print: "直接列印 / 另存 PDF",
+                new_window_print: "新頁面列印",
+                menu_subtitle_pdf: "GourmetLog 美食秘菜單 ‧ 典藏食譜",
+                print_date: "印製日期",
+                menu_footer_tag: "專屬私人美食紀錄與推薦菜單",
+                items_count_pdf: "{count}款精選",
+                no_location: "未標註地點",
+                toast_compressing: "圖片壓縮處理中...",
+                toast_compressed: "照片最佳化完成！",
+                toast_invalid_name: "請輸入有效的食品名稱！",
+                toast_invalid_price: "請輸入合理的價格 (不可低於 0)！",
+                toast_updated: "美食紀錄已更新！",
+                toast_added: "成功新增一道美食記錄！",
+                toast_cart_empty: "菜單原本就是空的",
+                toast_cleared_cart: "已清空菜單",
+                toast_deleted: "已刪除該美食紀錄",
+                toast_reset_success: "已重置為預設美食範例數據",
+                toast_imported: "成功匯入美食備份紀錄！",
+                toast_format_error: "檔案格式有誤",
+                toast_parse_error: "解析 JSON 檔案失敗",
+                toast_no_data: "目前沒有資料可供匯出",
+                toast_pdf_no_data: "目前未有任何食品紀錄可供匯出餐牌",
+                toast_ios_save: "請選「儲存到檔案」",
+                toast_copied_json: "已複製 JSON！請貼至備忘錄或檔案 App 存成 .json",
+                toast_export_success: "已匯出 JSON 備份檔案",
+                toast_rest_updated: "已更新點餐系統名稱！",
+                toast_enter_rest_name: "請輸入有效的餐廳名稱",
+                confirm_clear_cart_title: "確定要清空菜單嗎？",
+                confirm_clear_cart_msg: "這將會移除目前購物車內的所有點單。",
+                confirm_delete_title: "確定要刪除這筆美食紀錄？",
+                confirm_delete_msg: "刪除後該食品將無法救回。",
+                confirm_reset_title: "確定重置為預設範例菜單？",
+                confirm_reset_msg: "這將會覆蓋你目前的紀錄並回復範例資料。"
+            },
+            en: {
+                welcome_badge: "Self-Ordering & Gourmet Log System",
+                welcome_sub: "Welcome! Click below to browse the secret menu and log your gourmet dishes",
+                dining_mode: "Dining Mode",
+                table_prefix: "Dine-in / Table {table}",
+                start_ordering: "Start Ordering",
+                secret_menu_badge: "Secret Menu · Food Log",
+                app_subtitle: "Personal Gourmet Logging System",
+                search_placeholder: "Search dishes, restaurants, or notes...",
+                add_record: "Add Gourmet Record",
+                add_record_short: "Log",
+                nav_categories: "Menu Categories",
+                sort_and_filters: "Sort & Filters",
+                sort_label: "Sort By",
+                sort_newest: "Newest First",
+                sort_rating_desc: "Highest Rating (5★ → 1★)",
+                sort_price_desc: "Price: High to Low",
+                sort_price_asc: "Price: Low to High",
+                rating_filter_label: "Rating Filter",
+                rf_all: "All",
+                rf_5: "5★ Must Try",
+                rf_4: "4★+ Top Pick",
+                cat_all: "All",
+                cat_mains: "Mains",
+                cat_drinks: "Drinks",
+                cat_desserts: "Desserts",
+                cat_snacks: "Snacks",
+                all_dishes_title: "All Dishes",
+                category_dishes_title: "{cat} Menu",
+                displaying_items: "Displaying {count} gourmet records",
+                random_pick: "Daily Pick",
+                random_toast: "🎲 How about this today: {title}!",
+                no_items_title: "No Food Records Found",
+                no_items_sub: "Click 'Add Gourmet Record' at the top right to log your first dish!",
+                no_items_btn: "Add Record",
+                cart_title: "Today's Order List",
+                cart_empty: "Your order is empty! Click '+' on dish cards to add items.",
+                total_budget: "Total Amount",
+                clear_cart: "Clear Order",
+                confirm_order: "Confirm Order",
+                order_success: "🎉 Order placed successfully! Enjoy your meal!",
+                add_to_cart: "Add to Order",
+                added_to_cart: "Added '{title}' to order",
+                detail_title: "Gourmet Dish Details",
+                notes_label: "Food Notes & Reviews",
+                no_notes: "No detailed notes written, but this dish was certainly memorable!",
+                delete_record: "Delete Record",
+                edit_record: "Edit",
+                add_modal_title: "Add Gourmet Record",
+                edit_modal_title: "Edit Gourmet Record",
+                photo_label: "Photo (Camera / Gallery)",
+                photo_placeholder: "Click to take photo or upload image",
+                photo_sub: "(Image will be compressed automatically)",
+                title_label: "Dish Name *",
+                category_label: "Category *",
+                price_label: "Price (HK$) *",
+                location_label: "Restaurant / Location",
+                location_placeholder: "e.g., Causeway Bay",
+                title_placeholder: "e.g., Tonkotsu Chashu Ramen",
+                rating_label: "Star Rating",
+                notes_placeholder: "Note flavor profile, recommendations, or revisit rating...",
+                cancel: "Cancel",
+                save: "Save Record",
+                stats_title: "Gourmet Analytics & Spending",
+                total_items_stat: "Total Items",
+                avg_price_stat: "Avg Item Price",
+                cat_breakdown: "Category Breakdown",
+                close: "Close",
+                settings_title: "System Settings & Data Management",
+                restaurant_name_label: "Restaurant / System Name",
+                save_name: "Save Name",
+                backup_desc: "Backup your food log anytime or import a JSON backup file to seamlessly preserve your records across devices.",
+                export_pdf: "Export / Print Restaurant Menu (PDF)",
+                export_json: "Export JSON Backup File",
+                export_ios_note: "iPhone: Opens share sheet, select 'Save to Files'",
+                import_json: "Import JSON Backup File",
+                reset_sample: "Reset to Sample Menu",
+                finish: "Done",
+                confirm_title: "Confirm Action?",
+                confirm_msg: "This action cannot be undone.",
+                confirm_exec: "Confirm",
+                pdf_title: "Menu Preview",
+                pdf_sub: "Review menu layout, click to print or save as PDF",
+                direct_print: "Direct Print / Save PDF",
+                new_window_print: "Print in New Tab",
+                menu_subtitle_pdf: "GourmetLog Secret Menu · Special Selection",
+                print_date: "Printed Date",
+                menu_footer_tag: "Exclusive Personal Gourmet Menu",
+                items_count_pdf: "{count} items",
+                no_location: "Unspecified location",
+                toast_compressing: "Compressing image...",
+                toast_compressed: "Photo optimized!",
+                toast_invalid_name: "Please enter a valid dish name!",
+                toast_invalid_price: "Please enter a valid price (>= 0)!",
+                toast_updated: "Gourmet record updated!",
+                toast_added: "New gourmet record added!",
+                toast_cart_empty: "Order list is already empty",
+                toast_cleared_cart: "Order list cleared",
+                toast_deleted: "Gourmet record deleted",
+                toast_reset_success: "Reset to sample menu data",
+                toast_imported: "Gourmet backup imported successfully!",
+                toast_format_error: "Invalid file format",
+                toast_parse_error: "Failed to parse JSON file",
+                toast_no_data: "No data available to export",
+                toast_pdf_no_data: "No food items recorded to export menu PDF",
+                toast_ios_save: "Select 'Save to Files'",
+                toast_copied_json: "JSON copied! Paste into Notes or Files app to save as .json",
+                toast_export_success: "Exported JSON backup file",
+                toast_rest_updated: "Restaurant name updated!",
+                toast_enter_rest_name: "Please enter a valid restaurant name",
+                confirm_clear_cart_title: "Clear Order List?",
+                confirm_clear_cart_msg: "This will remove all items currently in your order.",
+                confirm_delete_title: "Delete Gourmet Record?",
+                confirm_delete_msg: "This dish will be permanently removed.",
+                confirm_reset_title: "Reset to Sample Menu?",
+                confirm_reset_msg: "This will overwrite your current records with sample data."
+            }
+        };
+
+        let currentLang = localStorage.getItem('gourmet_lang') || 'zh';
+
+        function t(key, vars = {}) {
+            let text = (translations[currentLang] && translations[currentLang][key]) 
+                    || (translations['zh'] && translations['zh'][key]) 
+                    || key;
+            Object.keys(vars).forEach(k => {
+                text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), vars[k]);
+            });
+            return text;
+        }
+
+        // Category mapping helper for backwards compatibility with older JSON backups
+        const CATEGORY_MAP = {
+            '主食': 'mains', 'mains': 'mains', 'main': 'mains',
+            '特飲': 'drinks', 'drinks': 'drinks', 'special drinks': 'drinks',
+            '甜品': 'desserts', 'desserts': 'desserts', 'dessert': 'desserts',
+            '小食': 'snacks', 'snacks': 'snacks', 'snack': 'snacks',
+            '全部': 'all', 'all': 'all'
+        };
+
+        function getCategoryKey(catStr) {
+            if (!catStr) return 'mains';
+            const lower = catStr.trim().toLowerCase();
+            return CATEGORY_MAP[catStr] || CATEGORY_MAP[lower] || 'mains';
+        }
+
+        function getCategoryLabel(catStr) {
+            const key = getCategoryKey(catStr);
+            return t(`cat_${key}`);
+        }
+
+        const categoryDefs = [
+            { key: 'all', icon: 'fa-border-all' },
+            { key: 'mains', icon: 'fa-bowl-food' },
+            { key: 'drinks', icon: 'fa-glass-water' },
+            { key: 'desserts', icon: 'fa-ice-cream' },
+            { key: 'snacks', icon: 'fa-cookie-bite' }
+        ];
 
         const defaultFoodItems = [
             {
@@ -653,12 +947,13 @@
         ];
 
         let foodItems = [];
-        let currentCategory = '全部';
+        let currentCategoryKey = 'all';
         let currentRatingFilter = 0; // 0 = all, 4 = 4+, 5 = 5.0 only
         let currentRatingInput = 5;
         let cart = []; // Array of { ...item, qty: number }
         let activeModalItemId = null;
         let restaurantName = '荃港大冰室';
+        let currentTableCode = 'A-08';
         let pendingConfirmAction = null;
         let toastTimer = null;
 
@@ -710,42 +1005,158 @@
             }
         }
 
-        const categories = [
-            { name: '全部', icon: 'fa-border-all' },
-            { name: '主食', icon: 'fa-bowl-food' },
-            { name: '特飲', icon: 'fa-glass-water' },
-            { name: '甜品', icon: 'fa-ice-cream' },
-            { name: '小食', icon: 'fa-cookie-bite' }
-        ];
-
         window.onload = function() {
             setRandomTableNumber();
             loadRestaurantName();
             loadItems();
-            renderCategories();
-            renderMenu();
+            updateLanguageUI();
             setRating(5);
             setupGlobalAccessibility();
 
-            // Handle invalid input for negative price
             const priceInput = document.getElementById('inputPrice');
             if (priceInput) {
                 priceInput.addEventListener('invalid', function(e) {
                     e.preventDefault();
-                    showToast('請輸入合理的價格 (不可低於 0)！', true);
+                    showToast(t('toast_invalid_price'), true);
                 });
             }
         };
 
+        function setLanguage(lang) {
+            if (lang !== 'zh' && lang !== 'en') return;
+            currentLang = lang;
+            localStorage.setItem('gourmet_lang', lang);
+            updateLanguageUI();
+        }
+
+        function toggleLanguage() {
+            setLanguage(currentLang === 'zh' ? 'en' : 'zh');
+        }
+
+        function updateLanguageUI() {
+            // Update Welcome / Start Screen
+            const btnZh = document.getElementById('welcomeLangZh');
+            const btnEn = document.getElementById('welcomeLangEn');
+            if (btnZh && btnEn) {
+                if (currentLang === 'zh') {
+                    btnZh.className = "flex-1 py-1.5 px-3 rounded-xl transition-all bg-brand-600 text-white font-black shadow-sm cursor-pointer";
+                    btnEn.className = "flex-1 py-1.5 px-3 rounded-xl transition-all text-slate-400 hover:text-white font-semibold cursor-pointer";
+                } else {
+                    btnEn.className = "flex-1 py-1.5 px-3 rounded-xl transition-all bg-brand-600 text-white font-black shadow-sm cursor-pointer";
+                    btnZh.className = "flex-1 py-1.5 px-3 rounded-xl transition-all text-slate-400 hover:text-white font-semibold cursor-pointer";
+                }
+            }
+
+            document.getElementById('welcomeBadge').textContent = t('welcome_badge');
+            document.getElementById('welcomeSubtitle').textContent = t('welcome_sub');
+            document.getElementById('welcomeDiningLabel').textContent = t('dining_mode');
+            document.getElementById('welcomeTableTag').textContent = t('table_prefix', { table: currentTableCode });
+            document.getElementById('welcomeStartBtn').querySelector('span').textContent = t('start_ordering');
+
+            // Header Elements
+            document.getElementById('headerLangText').textContent = currentLang === 'zh' ? 'EN' : '中文';
+            document.getElementById('appHeaderBadge').textContent = t('secret_menu_badge');
+            document.getElementById('appHeaderSubtitle').textContent = t('app_subtitle');
+            document.getElementById('searchInput').placeholder = t('search_placeholder');
+            document.getElementById('mobileSearchInput').placeholder = t('search_placeholder');
+            document.getElementById('headerAddBtnText').textContent = t('add_record');
+            document.getElementById('headerAddBtnTextShort').textContent = t('add_record_short');
+
+            // Sidebar Elements
+            document.getElementById('sidebarCatHeader').textContent = t('nav_categories');
+            document.getElementById('sidebarFilterHeader').textContent = t('sort_and_filters');
+            document.getElementById('sortByLabel').textContent = t('sort_label');
+            document.getElementById('sortOptNewest').textContent = t('sort_newest');
+            document.getElementById('sortOptRating').textContent = t('sort_rating_desc');
+            document.getElementById('sortOptPriceDesc').textContent = t('sort_price_desc');
+            document.getElementById('sortOptPriceAsc').textContent = t('sort_price_asc');
+            document.getElementById('ratingFilterLabel').textContent = t('rating_filter_label');
+
+            document.getElementById('rf-0').textContent = t('rf_all');
+            document.getElementById('rf-5').textContent = t('rf_5');
+            document.getElementById('rf-4').textContent = t('rf_4');
+
+            document.getElementById('randomPickBtnText').textContent = t('random_pick');
+            document.getElementById('emptyStateTitle').textContent = t('no_items_title');
+            document.getElementById('emptyStateSub').textContent = t('no_items_sub');
+            document.getElementById('emptyStateBtnText').textContent = t('no_items_btn');
+
+            // Cart Drawer
+            document.getElementById('cartDrawerTitle').textContent = t('cart_title');
+            document.getElementById('cartTotalLabel').textContent = t('total_budget');
+            document.getElementById('clearCartBtn').textContent = t('clear_cart');
+            document.getElementById('confirmOrderBtn').textContent = t('confirm_order');
+
+            // Food Detail Modal
+            document.getElementById('detailNotesHeader').textContent = t('notes_label');
+            document.getElementById('detailDeleteBtn').innerHTML = `<i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> ${t('delete_record')}`;
+            document.getElementById('detailEditBtn').innerHTML = `<i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> ${t('edit_record')}`;
+            document.getElementById('detailAddToCartBtn').innerHTML = `<i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> ${t('add_to_cart')}`;
+
+            // Add/Edit Modal
+            document.getElementById('labelPhoto').textContent = t('photo_label');
+            document.getElementById('photoPlaceholderText').textContent = t('photo_placeholder');
+            document.getElementById('photoSubText').textContent = t('photo_sub');
+            document.getElementById('labelTitle').textContent = t('title_label');
+            document.getElementById('labelCategory').textContent = t('category_label');
+            document.getElementById('labelPrice').textContent = t('price_label');
+            document.getElementById('labelLocation').textContent = t('location_label');
+            document.getElementById('labelRating').textContent = t('rating_label');
+            document.getElementById('labelNotes').textContent = t('notes_label');
+            
+            document.getElementById('inputTitle').placeholder = t('title_placeholder');
+            document.getElementById('inputLocation').placeholder = t('location_placeholder');
+            document.getElementById('inputNotes').placeholder = t('notes_placeholder');
+
+            document.getElementById('optMains').textContent = t('cat_mains');
+            document.getElementById('optDrinks').textContent = t('cat_drinks');
+            document.getElementById('optDesserts').textContent = t('cat_desserts');
+            document.getElementById('optSnacks').textContent = t('cat_snacks');
+
+            document.getElementById('btnFormCancel').textContent = t('cancel');
+            document.getElementById('btnFormSave').textContent = t('save');
+
+            // Stats Modal
+            document.getElementById('statsTitle').innerHTML = `<i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> ${t('stats_title')}`;
+            document.getElementById('statTotalItemsLabel').textContent = t('total_items_stat');
+            document.getElementById('statAvgPriceLabel').textContent = t('avg_price_stat');
+            document.getElementById('statBreakdownLabel').textContent = t('cat_breakdown');
+            document.getElementById('statsCloseBtn').textContent = t('close');
+
+            // Settings Modal
+            document.getElementById('settingsTitle').innerHTML = `<i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> ${t('settings_title')}`;
+            document.getElementById('labelRestaurantName').textContent = t('restaurant_name_label');
+            document.getElementById('btnSaveRestName').textContent = t('save_name');
+            document.getElementById('backupDescText').textContent = t('backup_desc');
+            document.getElementById('btnExportPDFText').textContent = t('export_pdf');
+            document.getElementById('btnExportJSONText').textContent = t('export_json');
+            document.getElementById('exportIosNote').textContent = t('export_ios_note');
+            document.getElementById('lblImportJSONText').textContent = t('import_json');
+            document.getElementById('btnResetSampleText').textContent = t('reset_sample');
+            document.getElementById('dataFinishBtn').textContent = t('finish');
+
+            // Confirmation Modal
+            document.getElementById('confirmModalCancelBtn').textContent = t('cancel');
+            document.getElementById('confirmModalActionBtn').textContent = t('confirm_exec');
+
+            // PDF Preview Modal
+            document.getElementById('pdfPreviewTitle').textContent = t('pdf_title');
+            document.getElementById('pdfPreviewSub').textContent = t('pdf_sub');
+            document.getElementById('pdfDirectPrintText').textContent = t('direct_print');
+            document.getElementById('pdfNewWinText').textContent = t('new_window_print');
+
+            renderCategories();
+            renderMenu();
+            updateCartUI();
+        }
+
         function setupGlobalAccessibility() {
-            // Support ESC key closing active modal / drawer
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeAllModals();
                 }
             });
 
-            // Support Backdrop clicking to close modals
             const modalIds = ['detailModal', 'addModal', 'statsModal', 'dataModal', 'confirmModal', 'menuPreviewModal'];
             modalIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -783,9 +1194,10 @@
             const randomZone = zones[Math.floor(Math.random() * zones.length)];
             const randomNum = Math.floor(Math.random() * 18) + 1;
             const formattedNum = randomNum < 10 ? `0${randomNum}` : `${randomNum}`;
+            currentTableCode = `${randomZone}-${formattedNum}`;
             const tableElement = document.getElementById('welcomeTableTag');
             if (tableElement) {
-                tableElement.textContent = `堂食 / ${randomZone}-${formattedNum} 桌`;
+                tableElement.textContent = t('table_prefix', { table: currentTableCode });
             }
         }
 
@@ -806,13 +1218,13 @@
         function saveRestaurantName() {
             const inputVal = document.getElementById('inputRestaurantName').value.trim();
             if (!inputVal) {
-                showToast('請輸入有效的餐廳名稱', true);
+                showToast(t('toast_enter_rest_name'), true);
                 return;
             }
             restaurantName = inputVal;
             localStorage.setItem('gourmet_restaurant_name', restaurantName);
             updateRestaurantNameUI();
-            showToast('已更新點餐系統名稱！');
+            showToast(t('toast_rest_updated'));
         }
 
         function loadItems() {
@@ -859,23 +1271,24 @@
         function renderCategories() {
             const nav = document.getElementById('categoryNav');
 
-            nav.innerHTML = categories.map(cat => {
-                const active = cat.name === currentCategory;
+            nav.innerHTML = categoryDefs.map(cat => {
+                const active = cat.key === currentCategoryKey;
                 const activeClasses = active 
                     ? 'bg-brand-600 text-white font-bold shadow-sm shadow-brand-500/30' 
                     : 'bg-slate-100 md:bg-transparent text-slate-600 hover:bg-slate-100 font-semibold';
-                
+                const label = t(`cat_${cat.key}`);
+
                 return `
-                    <button onclick="selectCategory('${escapeHtml(cat.name)}')" aria-label="切換至 ${escapeHtml(cat.name)} 類別" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all cursor-pointer ${activeClasses}">
+                    <button onclick="selectCategory('${cat.key}')" aria-label="${label}" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all cursor-pointer ${activeClasses}">
                         <i class="fa-solid ${cat.icon} text-xs" aria-hidden="true"></i>
-                        <span>${escapeHtml(cat.name)}</span>
+                        <span>${escapeHtml(label)}</span>
                     </button>
                 `;
             }).join('');
         }
 
-        function selectCategory(catName) {
-            currentCategory = catName;
+        function selectCategory(catKey) {
+            currentCategoryKey = catKey;
             renderCategories();
             renderMenu();
         }
@@ -902,16 +1315,16 @@
             const searchVal = (document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value || '').trim().toLowerCase();
             const sortBy = document.getElementById('sortBy').value;
 
-            // Clear search button status
             const clearBtn = document.getElementById('clearSearchBtn');
             if (searchVal) clearBtn.classList.remove('hidden');
             else clearBtn.classList.add('hidden');
 
-            titleEl.querySelector('span').textContent = currentCategory === '全部' ? '全部點餐紀錄' : `${currentCategory} 菜單`;
+            const catLabel = t(`cat_${currentCategoryKey}`);
+            titleEl.querySelector('span').textContent = currentCategoryKey === 'all' ? t('all_dishes_title') : t('category_dishes_title', { cat: catLabel });
 
-            // Filtering logic
             let filtered = foodItems.filter(item => {
-                const matchCat = currentCategory === '全部' || item.category === currentCategory;
+                const itemCatKey = getCategoryKey(item.category);
+                const matchCat = currentCategoryKey === 'all' || itemCatKey === currentCategoryKey;
                 const matchSearch = !searchVal || 
                                     item.title.toLowerCase().includes(searchVal) ||
                                     (item.location && item.location.toLowerCase().includes(searchVal)) ||
@@ -924,7 +1337,6 @@
                 return matchCat && matchSearch && matchRating;
             });
 
-            // Sorting logic
             filtered.sort((a, b) => {
                 if (sortBy === 'newest') return new Date(b.date || 0) - new Date(a.date || 0);
                 if (sortBy === 'ratingDesc') return b.rating - a.rating;
@@ -933,8 +1345,8 @@
                 return 0;
             });
 
-            totalBadge.textContent = `${filtered.length} / ${foodItems.length} 項`;
-            countEl.textContent = `共顯示 ${filtered.length} 道美味餐點紀錄`;
+            totalBadge.textContent = `${filtered.length} / ${foodItems.length}`;
+            countEl.textContent = t('displaying_items', { count: filtered.length });
 
             if (filtered.length === 0) {
                 grid.innerHTML = '';
@@ -952,12 +1364,11 @@
 
             grid.innerHTML = filtered.map(item => `
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
-                    <!-- Image Box -->
                     <div class="relative h-44 bg-slate-100 overflow-hidden cursor-pointer" onclick="openDetailModal('${escapeHtml(item.id)}')">
                         <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                              onerror="this.src='https://placehold.co/600x400/fff7ed/ea580c?text=GourmetLog'">
                         <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xs">
-                            ${escapeHtml(item.category)}
+                            ${escapeHtml(getCategoryLabel(item.category))}
                         </div>
                         <div class="absolute bottom-3 right-3 bg-slate-900/70 backdrop-blur-md text-amber-300 text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
                             <i class="fa-solid fa-star text-[10px]" aria-hidden="true"></i>
@@ -965,7 +1376,6 @@
                         </div>
                     </div>
 
-                    <!-- Details Card Content -->
                     <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
                         <div>
                             <h3 onclick="openDetailModal('${escapeHtml(item.id)}')" class="font-bold text-slate-900 text-sm sm:text-base leading-snug cursor-pointer hover:text-brand-600 transition-colors line-clamp-1">
@@ -973,17 +1383,16 @@
                             </h3>
                             <p class="text-xs text-slate-400 mt-1 flex items-center gap-1 line-clamp-1">
                                 <i class="fa-solid fa-location-dot text-brand-500 text-[10px]" aria-hidden="true"></i>
-                                ${escapeHtml(item.location || '未標註地點')}
+                                ${escapeHtml(item.location || t('no_location'))}
                             </p>
                         </div>
 
-                        <!-- Price & Plus Order Button -->
                         <div class="pt-2.5 border-t border-slate-50 flex items-center justify-between">
                             <div>
                                 <p class="text-base sm:text-lg font-black text-slate-900">HK$${parseFloat(item.price).toFixed(1)}</p>
                             </div>
                             <div class="flex items-center gap-1.5">
-                                <button onclick="addToCart('${escapeHtml(item.id)}')" aria-label="加入 ${escapeHtml(item.title)} 至點單" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-90 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-brand-500/20 transition-all cursor-pointer" title="加入點單">
+                                <button onclick="addToCart('${escapeHtml(item.id)}')" aria-label="${t('add_to_cart')} ${escapeHtml(item.title)}" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-90 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md shadow-brand-500/20 transition-all cursor-pointer" title="${t('add_to_cart')}">
                                     +
                                 </button>
                             </div>
@@ -1000,11 +1409,11 @@
 
             document.getElementById('detailTitle').textContent = item.title;
             document.getElementById('detailPrice').textContent = `HK$${parseFloat(item.price).toFixed(1)}`;
-            document.getElementById('detailLocation').querySelector('span').textContent = item.location || '未標註餐廳地點';
-            document.getElementById('detailCategoryTag').textContent = item.category;
+            document.getElementById('detailLocation').querySelector('span').textContent = item.location || t('no_location');
+            document.getElementById('detailCategoryTag').textContent = getCategoryLabel(item.category);
             document.getElementById('detailImg').src = item.image;
-            document.getElementById('detailNotes').textContent = item.notes || '這次沒有寫下詳細筆記，但這道美味一定令人印象深刻！';
-            document.getElementById('detailDate').textContent = item.date || '未知日期';
+            document.getElementById('detailNotes').textContent = item.notes || t('no_notes');
+            document.getElementById('detailDate').textContent = item.date || '';
 
             const starsContainer = document.getElementById('detailStars');
             starsContainer.innerHTML = '';
@@ -1045,10 +1454,19 @@
             form.reset();
 
             if (editItem) {
-                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-brand-600" aria-hidden="true"></i> 編輯美食記錄`;
+                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-brand-600" aria-hidden="true"></i> ${t('edit_modal_title')}`;
                 document.getElementById('editingItemId').value = editItem.id;
                 document.getElementById('inputTitle').value = editItem.title;
-                document.getElementById('inputCategory').value = editItem.category;
+                
+                // Set option matching canonical key or category name
+                const catKey = getCategoryKey(editItem.category);
+                const selectEl = document.getElementById('inputCategory');
+                if (catKey === 'mains') selectEl.value = '主食';
+                else if (catKey === 'drinks') selectEl.value = '特飲';
+                else if (catKey === 'desserts') selectEl.value = '甜品';
+                else if (catKey === 'snacks') selectEl.value = '小食';
+                else selectEl.value = editItem.category;
+
                 document.getElementById('inputPrice').value = editItem.price;
                 document.getElementById('inputLocation').value = editItem.location || '';
                 document.getElementById('inputNotes').value = editItem.notes || '';
@@ -1060,7 +1478,7 @@
                     document.getElementById('imagePlaceholder').classList.add('hidden');
                 }
             } else {
-                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> 新增美食點餐紀錄`;
+                document.getElementById('addModalTitle').innerHTML = `<i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> ${t('add_modal_title')}`;
                 document.getElementById('editingItemId').value = '';
                 document.getElementById('imagePreview').classList.add('hidden');
                 document.getElementById('imagePlaceholder').classList.remove('hidden');
@@ -1106,7 +1524,7 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            showToast('圖片壓縮處理中...', false);
+            showToast(t('toast_compressing'), false);
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -1142,7 +1560,7 @@
                     previewImg.src = compressedBase64;
                     previewImg.classList.remove('hidden');
                     document.getElementById('imagePlaceholder').classList.add('hidden');
-                    showToast('照片最佳化完成！');
+                    showToast(t('toast_compressed'));
                 };
             };
         }
@@ -1158,11 +1576,11 @@
             const previewSrc = document.getElementById('imagePreview').src;
 
             if (!title) {
-                showToast('請輸入有效的食品名稱！', true);
+                showToast(t('toast_invalid_name'), true);
                 return;
             }
             if (isNaN(rawPrice) || rawPrice < 0) {
-                showToast('請輸入合理的價格 (不可低於 0)！', true);
+                showToast(t('toast_invalid_price'), true);
                 return;
             }
             const price = rawPrice;
@@ -1179,7 +1597,7 @@
                         title, category, price, location, notes, image,
                         rating: currentRatingInput
                     };
-                    showToast('美食紀錄已更新！');
+                    showToast(t('toast_updated'));
                 }
             } else {
                 const newItem = {
@@ -1194,7 +1612,7 @@
                     date: new Date().toISOString().split('T')[0]
                 };
                 foodItems.unshift(newItem);
-                showToast('成功新增一道美食記錄！');
+                showToast(t('toast_added'));
             }
 
             saveItems();
@@ -1215,7 +1633,7 @@
             }
 
             updateCartUI();
-            showToast(`已將「${item.title}」加入菜單`);
+            showToast(t('added_to_cart', { title: item.title }));
         }
 
         function updateCartItemQty(idx, delta) {
@@ -1254,7 +1672,7 @@
                 cartList.innerHTML = `
                     <div class="text-center py-12 text-slate-400 space-y-2">
                         <i class="fa-solid fa-basket-shopping text-3xl" aria-hidden="true"></i>
-                        <p class="text-xs font-semibold">點單內暫時沒有餐點，按卡片上的「+」加點想吃的美味吧！</p>
+                        <p class="text-xs font-semibold">${t('cart_empty')}</p>
                     </div>
                 `;
             } else {
@@ -1330,13 +1748,13 @@
 
         function clearCart() {
             if (cart.length === 0) {
-                showToast('菜單原本就是空的');
+                showToast(t('toast_cart_empty'));
                 return;
             }
-            showConfirmDialog('確定要清空菜單嗎？', '這將會移除目前購物車內的所有點單。', () => {
+            showConfirmDialog(t('confirm_clear_cart_title'), t('confirm_clear_cart_msg'), () => {
                 cart = [];
                 updateCartUI();
-                showToast('已清空菜單');
+                showToast(t('toast_cleared_cart'));
             });
         }
 
@@ -1373,24 +1791,24 @@
 
         function showOrderSuccessToast() {
             if (cart.length === 0) {
-                showToast('菜單內暫時沒有項目哦！', true);
+                showToast(t('cart_empty'), true);
                 return;
             }
             closeCartDrawer();
-            showToast('🎉 點單成功！預祝你今天用餐愉快！');
+            showToast(t('order_success'));
             cart = [];
             updateCartUI();
         }
 
         function deleteItemFromModal() {
             if (!activeModalItemId) return;
-            showConfirmDialog('確定要刪除這筆美食紀錄？', '刪除後該食品將無法救回。', () => {
+            showConfirmDialog(t('confirm_delete_title'), t('confirm_delete_msg'), () => {
                 foodItems = foodItems.filter(i => i.id !== activeModalItemId);
                 saveItems();
                 closeDetailModal();
                 renderCategories();
                 renderMenu();
-                showToast('已刪除該美食紀錄');
+                showToast(t('toast_deleted'));
             });
         }
 
@@ -1405,13 +1823,13 @@
 
         function pickRandomFood() {
             if (foodItems.length === 0) {
-                showToast('未有食物記錄，請先點擊新增吧！', true);
+                showToast(t('no_items_title'), true);
                 return;
             }
             const randomIndex = Math.floor(Math.random() * foodItems.length);
             const picked = foodItems[randomIndex];
             openDetailModal(picked.id);
-            showToast(`🎲 今天就吃這個吧：${picked.title}！`);
+            showToast(t('random_toast', { title: picked.title }));
         }
 
         function handleSearch() {
@@ -1436,18 +1854,20 @@
 
                 const catCounts = {};
                 foodItems.forEach(i => {
-                    catCounts[i.category] = (catCounts[i.category] || 0) + 1;
+                    const cKey = getCategoryKey(i.category);
+                    catCounts[cKey] = (catCounts[cKey] || 0) + 1;
                 });
 
                 const breakdownContainer = document.getElementById('categoryBreakdown');
-                breakdownContainer.innerHTML = Object.keys(catCounts).map(cat => {
-                    const count = catCounts[cat];
+                breakdownContainer.innerHTML = Object.keys(catCounts).map(cKey => {
+                    const count = catCounts[cKey];
                     const pct = totalItems > 0 ? Math.round((count / totalItems) * 100) : 0;
+                    const cLabel = t(`cat_${cKey}`);
                     return `
                         <div>
                             <div class="flex justify-between font-bold text-slate-700 mb-1">
-                                <span>${escapeHtml(cat)}</span>
-                                <span class="text-brand-600">${count} 項 (${pct}%)</span>
+                                <span>${escapeHtml(cLabel)}</span>
+                                <span class="text-brand-600">${count} (${pct}%)</span>
                             </div>
                             <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                                 <div class="h-full bg-brand-500 rounded-full" style="width: ${pct}%"></div>
@@ -1497,30 +1917,32 @@
 
         function exportMenuPDF() {
             if (foodItems.length === 0) {
-                showToast('目前未有任何食品紀錄可供匯出餐牌', true);
+                showToast(t('toast_pdf_no_data'), true);
                 return;
             }
 
             const printContainer = document.getElementById('printableMenu');
             const previewContainer = document.getElementById('menuPreviewContent');
-            const todayStr = new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
+            const todayStr = new Date().toLocaleDateString(currentLang === 'zh' ? 'zh-HK' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            const categoryOrder = ['主食', '特飲', '甜品', '小食'];
+            const categoryOrderKeys = ['mains', 'drinks', 'desserts', 'snacks'];
             const grouped = {};
             
             foodItems.forEach(item => {
-                const cat = item.category || '其它';
-                if (!grouped[cat]) grouped[cat] = [];
-                grouped[cat].push(item);
+                const cKey = getCategoryKey(item.category);
+                if (!grouped[cKey]) grouped[cKey] = [];
+                grouped[cKey].push(item);
             });
 
-            const allCats = Array.from(new Set([...categoryOrder, ...Object.keys(grouped)]));
+            const allCatKeys = Array.from(new Set([...categoryOrderKeys, ...Object.keys(grouped)]));
 
             let categoryHtml = '';
 
-            allCats.forEach(cat => {
-                const items = grouped[cat];
+            allCatKeys.forEach(cKey => {
+                const items = grouped[cKey];
                 if (!items || items.length === 0) return;
+
+                const catLabel = t(`cat_${cKey}`);
 
                 const itemsHtml = items.map(item => {
                     const starsStr = '★'.repeat(Math.floor(item.rating)) + (item.rating % 1 >= 0.5 ? '½' : '');
@@ -1548,8 +1970,8 @@
                 categoryHtml += `
                     <div class="menu-page-break-avoid mb-6">
                         <div class="flex items-center gap-3 mb-3 border-b-2 border-slate-900 pb-1">
-                            <h3 class="text-lg font-black text-slate-900 tracking-wide">${escapeHtml(cat)}</h3>
-                            <span class="text-xs font-bold text-slate-500">(${items.length}款精選)</span>
+                            <h3 class="text-lg font-black text-slate-900 tracking-wide">${escapeHtml(catLabel)}</h3>
+                            <span class="text-xs font-bold text-slate-500">(${t('items_count_pdf', { count: items.length })})</span>
                         </div>
                         <div class="space-y-1">
                             ${itemsHtml}
@@ -1560,22 +1982,19 @@
 
             const fullMenuHtml = `
                 <div class="border-4 border-slate-900 p-6 sm:p-8 bg-white text-slate-900 shadow-none">
-                    <!-- Menu Header -->
                     <div class="text-center border-b-2 border-slate-900 pb-6 mb-6">
-                        <p class="text-xs font-bold tracking-widest text-brand-600 uppercase mb-1">GourmetLog 美食秘菜單 ‧ 典藏食譜</p>
+                        <p class="text-xs font-bold tracking-widest text-brand-600 uppercase mb-1">${t('menu_subtitle_pdf')}</p>
                         <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">${escapeHtml(restaurantName)}</h1>
-                        <p class="text-xs text-slate-500 font-semibold mt-2">印製日期：${todayStr} ｜ 專屬私人美食紀錄與推薦菜單</p>
+                        <p class="text-xs text-slate-500 font-semibold mt-2">${t('print_date')}：${todayStr} ｜ ${t('menu_footer_tag')}</p>
                     </div>
 
-                    <!-- Menu Content Grid -->
                     <div class="space-y-6">
                         ${categoryHtml}
                     </div>
 
-                    <!-- Menu Footer -->
                     <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-400 font-medium">
-                        <span>GourmetLog 美食秘菜單系統 自動生成</span>
-                        <span>${escapeHtml(restaurantName)} ‧ 私人推薦餐牌</span>
+                        <span>GourmetLog System</span>
+                        <span>${escapeHtml(restaurantName)} ‧ ${t('menu_footer_tag')}</span>
                     </div>
                 </div>
             `;
@@ -1621,10 +2040,10 @@
             }
             printWin.document.write(`
                 <!DOCTYPE html>
-                <html lang="zh-HK">
+                <html lang="${currentLang === 'zh' ? 'zh-HK' : 'en'}">
                 <head>
                     <meta charset="UTF-8">
-                    <title>${escapeHtml(restaurantName)} - 餐廳餐牌</title>
+                    <title>${escapeHtml(restaurantName)} - Menu</title>
                     <script src="https://cdn.tailwindcss.com"><\/script>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -1651,7 +2070,7 @@
 
         async function exportData() {
             if (!foodItems || foodItems.length === 0) {
-                showToast('目前沒有資料可供匯出', true);
+                showToast(t('toast_no_data'), true);
                 return;
             }
 
@@ -1662,40 +2081,36 @@
             const blob = new Blob([jsonString], { type: 'application/json' });
             const file = new File([blob], filename, { type: 'application/json' });
 
-            // 1. 嘗試使用 Web Share API (針對 iOS 只傳送 { files: [file] }，防止產生額外的文字檔)
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     const shareData = { files: [file] };
                     if (!isIOS) {
-                        shareData.title = 'GourmetLog 備份';
+                        shareData.title = 'GourmetLog Backup';
                     }
                     await navigator.share(shareData);
-                    showToast('請選「儲存到檔案」');
+                    showToast(t('toast_ios_save'));
                     return;
                 } catch (err) {
-                    // 使用者在分享選單中點擊取消 (AbortError) 時直接靜默結束
                     if (err.name === 'AbortError') {
                         return;
                     }
                 }
             }
 
-            // 2. iOS 若不支援或未能完成 Web Share，則後備複製 JSON 至剪貼簿（iOS 嚴禁執行 <a download>）
             if (isIOS) {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     try {
                         await navigator.clipboard.writeText(jsonString);
-                        showToast('已複製 JSON！請貼至備忘錄或檔案 App 存成 .json');
+                        showToast(t('toast_copied_json'));
                         return;
                     } catch (e) {
-                        // 複製失敗
+                        // Copy failed
                     }
                 }
-                showToast('無法自動匯出，請複製資料後手動備份', true);
+                showToast(t('toast_no_data'), true);
                 return;
             }
 
-            // 3. 桌面端 / 非 iOS 標準瀏覽器使用 Blob URL 下載
             try {
                 const url = URL.createObjectURL(blob);
                 const dlAnchor = document.createElement('a');
@@ -1705,9 +2120,9 @@
                 dlAnchor.click();
                 document.body.removeChild(dlAnchor);
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
-                showToast('已匯出 JSON 備份檔案');
+                showToast(t('toast_export_success'));
             } catch (err) {
-                showToast('匯出失敗，請重試或改用電腦開版', true);
+                showToast('匯出失敗，請重試', true);
             }
         }
 
@@ -1724,25 +2139,25 @@
                         renderCategories();
                         renderMenu();
                         closeDataModal();
-                        showToast('成功匯入美食備份紀錄！');
+                        showToast(t('toast_imported'));
                     } else {
-                        showToast('檔案格式有誤', true);
+                        showToast(t('toast_format_error'), true);
                     }
                 } catch (err) {
-                    showToast('解析 JSON 檔案失敗', true);
+                    showToast(t('toast_parse_error'), true);
                 }
             };
             reader.readAsText(file);
         }
 
         function resetToSampleData() {
-            showConfirmDialog('確定重置為預設範例菜單？', '這將會覆蓋你目前的紀錄並回復範例資料。', () => {
+            showConfirmDialog(t('confirm_reset_title'), t('confirm_reset_msg'), () => {
                 foodItems = [...defaultFoodItems];
                 saveItems();
                 renderCategories();
                 renderMenu();
                 closeDataModal();
-                showToast('已重置為預設美食範例數據');
+                showToast(t('toast_reset_success'));
             });
         }
 
@@ -1757,17 +2172,20 @@
             }
 
             toastMsg.textContent = msg;
+
             if (isError) {
-                toastIcon.className = 'fa-solid fa-circle-exclamation text-amber-400 text-base';
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-base";
             } else {
-                toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base';
+                toastIcon.className = "fa-solid fa-circle-check text-green-400 text-base";
             }
 
-            toast.classList.remove('-translate-y-12', 'translate-y-20', 'opacity-0');
+            toast.classList.remove('opacity-0', '-translate-y-12', 'sm:translate-y-20', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
             toastTimer = setTimeout(() => {
-                toast.classList.add('opacity-0');
-                toastTimer = null;
-            }, 2500);
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-12', 'sm:translate-y-20', 'pointer-events-none');
+            }, 3000);
         }
     </script>
 </body>
