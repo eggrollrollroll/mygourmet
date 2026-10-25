@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GourmetLog - 美食秘菜單點餐紀錄系統 v1.8</title>
+    <title>GourmetLog - 美食秘菜單點餐紀錄系統 v1.8c</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -234,7 +234,8 @@
                     <h2 id="sidebarCatHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
                     <span id="totalItemsBadge" class="text-[11px] font-extrabold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0 項</span>
                 </div>
-                <nav class="flex max-[400px]:flex-wrap md:flex-col gap-1.5 overflow-x-auto hide-scrollbar pb-1 md:pb-0" id="categoryNav">
+                <!-- OPTIMIZATION: Removed hide-scrollbar and added pb-2 so scrollbar displays natively -->
+                <nav class="flex max-[400px]:flex-wrap md:flex-col gap-1.5 overflow-x-auto pb-2 md:pb-0" id="categoryNav">
                     <!-- Categories dynamically generated here -->
                 </nav>
             </div>
@@ -522,7 +523,7 @@
                     <h3 id="settingsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> 點餐系統設定 & 資料管理
                     </h3>
-                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8</span>
+                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8c</span>
                 </div>
                 <button onclick="toggleDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -586,8 +587,8 @@
         </div>
     </div>
 
-    <!-- Notification Toast (Fix: Raised top position to top-28 on mobile so search bar is clear) -->
-    <div id="toast" class="fixed top-28 sm:top-auto sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
+    <!-- OPTIMIZATION: Notification Toast moved downward so it does not block the cart's first row -->
+    <div id="toast" class="fixed bottom-28 sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 top-auto z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base shrink-0" aria-hidden="true"></i>
         <span id="toastMsg" class="text-xs sm:text-sm font-semibold leading-snug">提示訊息</span>
     </div>
@@ -1020,8 +1021,9 @@
         }
 
         window.onload = function() {
-            // Disable background scrolling while welcome screen is open
-            document.body.classList.add('overflow-hidden');
+            // OPTIMIZATION: Disable vertical scrolling on both html and body for welcome screen
+            document.documentElement.classList.add('overflow-y-hidden');
+            document.body.classList.add('overflow-y-hidden');
             
             setRandomTableNumber();
             loadRestaurantName();
@@ -1250,8 +1252,9 @@
         function startOrdering() {
             const welcome = document.getElementById('welcomeScreen');
             welcome.classList.add('opacity-0', 'pointer-events-none');
-            // Re-enable body scroll when welcome screen is closed
-            document.body.classList.remove('overflow-hidden');
+            // OPTIMIZATION: Re-enable scrolling on both elements
+            document.documentElement.classList.remove('overflow-y-hidden');
+            document.body.classList.remove('overflow-y-hidden');
             releaseFocusTrap();
             setTimeout(() => {
                 welcome.classList.add('hidden');
@@ -1263,8 +1266,9 @@
             const welcome = document.getElementById('welcomeScreen');
             welcome.classList.remove('hidden');
             welcome.removeAttribute('aria-hidden');
-            // Disable body scroll when welcome screen is displayed
-            document.body.classList.add('overflow-hidden');
+            // OPTIMIZATION: Disable scrolling on both elements
+            document.documentElement.classList.add('overflow-y-hidden');
+            document.body.classList.add('overflow-y-hidden');
             setTimeout(() => {
                 welcome.classList.remove('opacity-0', 'pointer-events-none');
                 trapFocus(welcome);
@@ -1398,7 +1402,8 @@
                             </p>
                         </div>
 
-                        <div class="pt-2 border-t border-slate-50 flex items-center justify-between">
+                        <!-- OPTIMIZATION: Added pr-14 sm:pr-16 to shift '+' button to the left of the floating FAB button -->
+                        <div class="pt-2 border-t border-slate-50 flex items-center justify-between pr-14 sm:pr-16">
                             <div>
                                 <p class="text-base sm:text-lg font-black text-slate-900">HK$${parseFloat(item.price).toFixed(1)}</p>
                             </div>
@@ -1622,30 +1627,96 @@
             closeAddModal();
         }
 
+        // Properly restore and complete truncated functions
         function editCurrentItem() {
             if (!activeModalItemId) return;
             const item = foodItems.find(i => i.id === activeModalItemId);
             if (item) {
                 closeDetailModal();
-                setTimeout(() => openAddModal(item), 200);
+                setTimeout(() => {
+                    openAddModal(item);
+                }, 250);
             }
         }
-
+        
         function deleteItemFromModal() {
-            if (!activeModalItemId) return;
-            showConfirmModal(
-                t('confirm_delete_title'),
-                t('confirm_delete_msg'),
-                () => {
-                    foodItems = foodItems.filter(i => i.id !== activeModalItemId);
-                    saveItems();
-                    renderMenu();
-                    closeDetailModal();
-                    showToast(t('toast_deleted'));
-                }
-            );
+            pendingConfirmAction = () => {
+                foodItems = foodItems.filter(i => i.id !== activeModalItemId);
+                saveItems();
+                renderMenu();
+                closeDetailModal();
+                showToast(t('toast_deleted'));
+            };
+            openConfirmModal(t('confirm_delete_title'), t('confirm_delete_msg'));
         }
-
+        
+        // Cart functions
+        function addToCart(id) {
+            const item = foodItems.find(i => i.id === id);
+            if (!item) return;
+            cart.push({ ...item, cartId: Date.now().toString() });
+            updateCartUI();
+            showToast(t('added_to_cart', { title: item.title }));
+        }
+        
+        function addToCartFromModal() {
+            if (activeModalItemId) {
+                addToCart(activeModalItemId);
+                closeDetailModal();
+            }
+        }
+        
+        function updateCartUI() {
+            const count = cart.length;
+            const badge = document.getElementById('floatingCartBadge');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            const list = document.getElementById('cartList');
+            if (count === 0) {
+                list.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">${t('cart_empty')}</p>`;
+                document.getElementById('cartTotal').textContent = 'HK$0.0';
+                return;
+            }
+            
+            list.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                    <div class="flex-1 truncate pr-2">
+                        <h4 class="text-sm font-bold text-slate-800 truncate">${escapeHtml(item.title)}</h4>
+                        <p class="text-xs text-brand-600 font-bold mt-0.5">HK$${parseFloat(item.price).toFixed(1)}</p>
+                    </div>
+                    <button onclick="removeFromCart('${item.cartId}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-50 flex items-center justify-center hover:bg-red-100 transition-colors shrink-0 cursor-pointer">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            const total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+            document.getElementById('cartTotal').textContent = `HK$${total.toFixed(1)}`;
+        }
+        
+        function removeFromCart(cartId) {
+            cart = cart.filter(i => i.cartId !== cartId);
+            updateCartUI();
+        }
+        
+        function clearCart() {
+            if (cart.length === 0) {
+                showToast(t('toast_cart_empty'));
+                return;
+            }
+            pendingConfirmAction = () => {
+                cart = [];
+                updateCartUI();
+                showToast(t('toast_cleared_cart'));
+            };
+            openConfirmModal(t('confirm_clear_cart_title'), t('confirm_clear_cart_msg'));
+        }
+        
         function toggleCartDrawer() {
             const drawer = document.getElementById('cartDrawer');
             if (drawer.classList.contains('hidden')) {
@@ -1659,10 +1730,9 @@
                 closeCartDrawer();
             }
         }
-
+        
         function closeCartDrawer() {
             const drawer = document.getElementById('cartDrawer');
-            if (drawer.classList.contains('hidden')) return;
             drawer.classList.add('translate-x-full');
             releaseFocusTrap();
             setTimeout(() => {
@@ -1670,144 +1740,27 @@
                 drawer.setAttribute('aria-hidden', 'true');
             }, 300);
         }
-
-        function addToCart(id) {
-            const item = foodItems.find(i => i.id === id);
-            if (!item) return;
-
-            const existing = cart.find(c => c.id === id);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({ ...item, qty: 1 });
-            }
-
-            updateCartUI();
-            showToast(t('added_to_cart', { title: item.title }));
-        }
-
-        function addToCartFromModal() {
-            if (activeModalItemId) {
-                addToCart(activeModalItemId);
-            }
-        }
-
-        function updateCartUI() {
-            const badge = document.getElementById('floatingCartBadge');
-            const cartList = document.getElementById('cartList');
-            const cartTotal = document.getElementById('cartTotal');
-
-            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-            if (totalQty > 0) {
-                badge.textContent = totalQty;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            cartTotal.textContent = `HK$${totalPrice.toFixed(1)}`;
-
-            if (cart.length === 0) {
-                cartList.innerHTML = `
-                    <div class="text-center py-12 text-slate-400 space-y-2">
-                        <i class="fa-solid fa-basket-shopping text-3xl opacity-40" aria-hidden="true"></i>
-                        <p class="text-xs">${t('cart_empty')}</p>
-                    </div>
-                `;
-                return;
-            }
-
-            cartList.innerHTML = cart.map(item => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
-                    <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="w-12 h-12 rounded-xl object-cover shrink-0" onerror="this.src='https://placehold.co/100x100/fff7ed/ea580c?text=Food'">
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-slate-800 text-xs truncate">${escapeHtml(item.title)}</h4>
-                        <p class="text-[11px] font-bold text-brand-600 mt-0.5">HK$${parseFloat(item.price).toFixed(1)}</p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="flex items-center bg-white border border-slate-200 rounded-lg p-0.5">
-                            <button onclick="updateCartQty('${escapeHtml(item.id)}', -1)" aria-label="減少數量" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded cursor-pointer font-bold text-xs">-</button>
-                            <span class="w-6 text-center text-xs font-black text-slate-800">${item.qty}</span>
-                            <button onclick="updateCartQty('${escapeHtml(item.id)}', 1)" aria-label="增加數量" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded cursor-pointer font-bold text-xs">+</button>
-                        </div>
-                        <button onclick="removeFromCart('${escapeHtml(item.id)}')" aria-label="移除此品項" class="text-slate-400 hover:text-red-500 p-1 cursor-pointer">
-                            <i class="fa-solid fa-trash-can text-xs" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateCartQty(id, delta) {
-            const item = cart.find(c => c.id === id);
-            if (!item) return;
-
-            item.qty += delta;
-            if (item.qty <= 0) {
-                removeFromCart(id);
-            } else {
-                updateCartUI();
-            }
-        }
-
-        function removeFromCart(id) {
-            cart = cart.filter(c => c.id !== id);
-            updateCartUI();
-        }
-
-        function clearCart() {
+        
+        function showOrderSuccessToast() {
             if (cart.length === 0) {
                 showToast(t('toast_cart_empty'));
                 return;
             }
-            showConfirmModal(
-                t('confirm_clear_cart_title'),
-                t('confirm_clear_cart_msg'),
-                () => {
-                    cart = [];
-                    updateCartUI();
-                    showToast(t('toast_cleared_cart'));
-                }
-            );
-        }
-
-        function showOrderSuccessToast() {
-            if (cart.length === 0) {
-                showToast(t('cart_empty'), true);
-                return;
-            }
+            showToast(t('order_success'));
             cart = [];
             updateCartUI();
             closeCartDrawer();
-            showToast(t('order_success'));
         }
-
+        
         function pickRandomFood() {
-            if (foodItems.length === 0) {
-                showToast(t('no_items_title'), true);
-                return;
-            }
-            const randomIndex = Math.floor(Math.random() * foodItems.length);
-            const picked = foodItems[randomIndex];
-            openDetailModal(picked.id);
-            showToast(t('random_toast', { title: picked.title }));
+            if (foodItems.length === 0) return;
+            const randomItem = foodItems[Math.floor(Math.random() * foodItems.length)];
+            showToast(t('random_toast', { title: randomItem.title }));
+            setTimeout(() => {
+                openDetailModal(randomItem.id);
+            }, 800);
         }
-
-        function handleSearch() {
-            const searchVal = document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value;
-            document.getElementById('searchInput').value = searchVal;
-            document.getElementById('mobileSearchInput').value = searchVal;
-            renderMenu();
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('mobileSearchInput').value = '';
-            renderMenu();
-        }
-
+        
         function toggleStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal.classList.contains('hidden')) {
@@ -1818,54 +1771,55 @@
                     trapFocus(modal);
                 }, 10);
             } else {
-                modal.classList.add('opacity-0');
-                releaseFocusTrap();
-                setTimeout(() => modal.classList.add('hidden'), 200);
+                closeStatsModal();
             }
         }
-
+        
+        function closeStatsModal() {
+            const modal = document.getElementById('statsModal');
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+        
         function updateStatsUI() {
-            const totalItemsEl = document.getElementById('statTotalItems');
-            const avgPriceEl = document.getElementById('statAvgPrice');
-            const bdEl = document.getElementById('categoryBreakdown');
-
             const total = foodItems.length;
-            totalItemsEl.textContent = total;
-
-            if (total === 0) {
-                avgPriceEl.textContent = 'HK$0.0';
-                bdEl.innerHTML = `<p class="text-slate-400 text-center py-2">尚無統計數據</p>`;
-                return;
-            }
-
-            const totalPrice = foodItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
-            avgPriceEl.textContent = `HK$${(totalPrice / total).toFixed(1)}`;
-
-            const counts = {};
+            document.getElementById('statTotalItems').textContent = total;
+            
+            let sumPrice = 0;
+            const catCounts = { '主食': 0, '特飲': 0, '甜品': 0, '小食': 0 };
+            
             foodItems.forEach(item => {
+                sumPrice += parseFloat(item.price) || 0;
                 const key = getCategoryKey(item.category);
-                counts[key] = (counts[key] || 0) + 1;
+                if (key === 'mains') catCounts['主食']++;
+                else if (key === 'drinks') catCounts['特飲']++;
+                else if (key === 'desserts') catCounts['甜品']++;
+                else if (key === 'snacks') catCounts['小食']++;
             });
-
-            bdEl.innerHTML = ['mains', 'drinks', 'desserts', 'snacks'].map(key => {
-                const count = counts[key] || 0;
-                const percent = Math.round((count / total) * 100);
-                const label = t(`cat_${key}`);
-
-                return `
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-xs font-semibold text-slate-700">
-                            <span>${escapeHtml(label)}</span>
-                            <span>${count} 項 (${percent}%)</span>
+            
+            const avg = total > 0 ? (sumPrice / total) : 0;
+            document.getElementById('statAvgPrice').textContent = `HK$${avg.toFixed(1)}`;
+            
+            const bd = document.getElementById('categoryBreakdown');
+            bd.innerHTML = '';
+            const colors = { '主食': 'bg-blue-500', '特飲': 'bg-teal-400', '甜品': 'bg-pink-400', '小食': 'bg-amber-400' };
+            
+            Object.keys(catCounts).forEach(k => {
+                const count = catCounts[k];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                bd.innerHTML += `
+                    <div class="flex items-center gap-2">
+                        <span class="w-10 text-[10px] text-slate-500 font-bold">${t('cat_' + CATEGORY_MAP[k])}</span>
+                        <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full ${colors[k]}" style="width: ${pct}%"></div>
                         </div>
-                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-brand-600 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                        </div>
+                        <span class="w-8 text-right text-[10px] font-black text-slate-700">${pct}%</span>
                     </div>
                 `;
-            }).join('');
+            });
         }
-
+        
         function toggleDataModal() {
             const modal = document.getElementById('dataModal');
             if (modal.classList.contains('hidden')) {
@@ -1875,119 +1829,20 @@
                     trapFocus(modal);
                 }, 10);
             } else {
-                modal.classList.add('opacity-0');
-                releaseFocusTrap();
-                setTimeout(() => modal.classList.add('hidden'), 200);
+                closeDataModal();
             }
         }
-
-        function exportData() {
-            if (foodItems.length === 0) {
-                showToast(t('toast_no_data'), true);
-                return;
-            }
-
-            const payload = {
-                version: "1.8",
-                restaurantName: restaurantName,
-                exportedAt: new Date().toISOString(),
-                items: foodItems
-            };
-
-            const jsonStr = JSON.stringify(payload, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const fileName = `GourmetLog_Backup_${new Date().toISOString().slice(0, 10)}.json`;
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-            if (isIOS && navigator.share && navigator.canShare) {
-                try {
-                    const file = new File([blob], fileName, { type: 'application/json' });
-                    if (navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: 'GourmetLog Backup',
-                            text: t('toast_ios_save')
-                        }).catch(() => {});
-                        return;
-                    }
-                } catch (e) {}
-            }
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast(t('toast_export_success'));
+        
+        function closeDataModal() {
+            const modal = document.getElementById('dataModal');
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => modal.classList.add('hidden'), 200);
         }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    let importedItems = [];
-
-                    if (Array.isArray(data)) {
-                        importedItems = data;
-                    } else if (data && Array.isArray(data.items)) {
-                        importedItems = data.items;
-                        if (data.restaurantName) {
-                            restaurantName = data.restaurantName;
-                            localStorage.setItem('gourmet_restaurant_name', restaurantName);
-                            updateRestaurantNameUI();
-                        }
-                    } else {
-                        showToast(t('toast_format_error'), true);
-                        return;
-                    }
-
-                    if (importedItems.length > 0) {
-                        foodItems = importedItems;
-                        saveItems();
-                        renderMenu();
-                        toggleDataModal();
-                        showToast(t('toast_imported'));
-                    } else {
-                        showToast(t('toast_format_error'), true);
-                    }
-                } catch (err) {
-                    showToast(t('toast_parse_error'), true);
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        function resetToSampleData() {
-            showConfirmModal(
-                t('confirm_reset_title'),
-                t('confirm_reset_msg'),
-                () => {
-                    foodItems = [...defaultFoodItems];
-                    restaurantName = '荃港大冰室';
-                    localStorage.setItem('gourmet_restaurant_name', restaurantName);
-                    updateRestaurantNameUI();
-                    saveItems();
-                    renderMenu();
-                    toggleDataModal();
-                    showToast(t('toast_reset_success'));
-                }
-            );
-        }
-
-        function showConfirmModal(title, msg, onConfirm) {
+        
+        function openConfirmModal(title, msg) {
             document.getElementById('confirmModalTitle').textContent = title;
             document.getElementById('confirmModalMsg').textContent = msg;
-            pendingConfirmAction = onConfirm;
-
             const modal = document.getElementById('confirmModal');
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -1995,46 +1850,208 @@
                 trapFocus(modal);
             }, 10);
         }
-
+        
         function closeConfirmModal(execute = false) {
             const modal = document.getElementById('confirmModal');
-            if (modal.classList.contains('hidden')) return;
-
             modal.classList.add('opacity-0');
             releaseFocusTrap();
             setTimeout(() => {
                 modal.classList.add('hidden');
-                if (execute && typeof pendingConfirmAction === 'function') {
-                    pendingConfirmAction();
-                }
-                pendingConfirmAction = null;
+                if (!execute) pendingConfirmAction = null;
             }, 200);
         }
-
+        
         function executeConfirmAction() {
+            if (pendingConfirmAction) pendingConfirmAction();
             closeConfirmModal(true);
         }
-
+        
+        function resetToSampleData() {
+            pendingConfirmAction = () => {
+                foodItems = [...defaultFoodItems];
+                saveItems();
+                renderMenu();
+                showToast(t('toast_reset_success'));
+                closeDataModal();
+            };
+            openConfirmModal(t('confirm_reset_title'), t('confirm_reset_msg'));
+        }
+        
+        function exportData() {
+            if (foodItems.length === 0) {
+                showToast(t('toast_no_data'), true);
+                return;
+            }
+            const dataStr = JSON.stringify(foodItems, null, 2);
+            
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS && navigator.share) {
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const file = new File([blob], 'gourmet_backup.json', { type: 'application/json' });
+                navigator.share({
+                    title: 'GourmetLog Backup',
+                    files: [file]
+                }).catch(() => {
+                    copyToClipboard(dataStr);
+                });
+                showToast(t('toast_ios_save'));
+            } else {
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `gourmet_backup_${new Date().getTime()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast(t('toast_export_success'));
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(t('toast_copied_json'));
+            }).catch(() => {
+                // fallback
+            });
+        }
+        
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+                showToast(t('toast_format_error'), true);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        foodItems = imported;
+                        saveItems();
+                        renderMenu();
+                        showToast(t('toast_imported'));
+                        closeDataModal();
+                    } else {
+                        showToast(t('toast_format_error'), true);
+                    }
+                } catch (error) {
+                    showToast(t('toast_parse_error'), true);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // reset
+        }
+        
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
             const toastIcon = document.getElementById('toastIcon');
-
-            if (toastTimer) clearTimeout(toastTimer);
-
-            toastMsg.textContent = msg;
-
+            document.getElementById('toastMsg').textContent = msg;
+            
             if (isError) {
-                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-base shrink-0";
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400 text-base shrink-0';
+                toast.classList.replace('border-slate-700/50', 'border-red-900/50');
             } else {
-                toastIcon.className = "fa-solid fa-circle-check text-green-400 text-base shrink-0";
+                toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base shrink-0';
+                toast.classList.replace('border-red-900/50', 'border-slate-700/50');
             }
-
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-
+            
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            
+            if (toastTimer) clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
-                toast.classList.add('opacity-0', 'pointer-events-none');
-            }, 2800);
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 3000);
+        }
+        
+        function handleSearch() {
+            renderMenu();
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            renderMenu();
+        }
+
+        // PDF Generation and Print Logic
+        function generatePrintableHTML() {
+            if (foodItems.length === 0) return '';
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString(currentLang === 'zh' ? 'zh-HK' : 'en-US');
+            
+            const grouped = {
+                'mains': [], 'drinks': [], 'desserts': [], 'snacks': []
+            };
+            
+            foodItems.forEach(item => {
+                const key = getCategoryKey(item.category);
+                if (grouped[key]) grouped[key].push(item);
+            });
+            
+            let html = `
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-black text-slate-900 mb-2">${escapeHtml(restaurantName)}</h1>
+                    <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">${t('menu_subtitle_pdf')}</p>
+                    <div class="mt-4 inline-block bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full font-medium">
+                        ${t('print_date')}: ${dateStr}
+                    </div>
+                </div>
+            `;
+            
+            const order = ['mains', 'drinks', 'snacks', 'desserts'];
+            
+            order.forEach(catKey => {
+                const items = grouped[catKey];
+                if (items.length > 0) {
+                    html += `
+                        <div class="mb-8 menu-page-break-avoid">
+                            <div class="flex items-center gap-3 mb-4">
+                                <h2 class="text-xl font-black text-brand-700 uppercase tracking-wide">${t('cat_' + catKey)}</h2>
+                                <div class="flex-grow border-b-2 border-brand-100"></div>
+                                <span class="text-xs font-bold text-slate-400">${t('items_count_pdf', { count: items.length })}</span>
+                            </div>
+                            <div class="space-y-4">
+                    `;
+                    
+                    items.sort((a, b) => b.rating - a.rating).forEach(item => {
+                        const stars = '★'.repeat(Math.floor(item.rating));
+                        html += `
+                            <div class="flex justify-between items-end">
+                                <div class="pr-2 max-w-[75%]">
+                                    <h3 class="text-base font-bold text-slate-800">${escapeHtml(item.title)} <span class="text-amber-500 text-xs ml-1">${stars}</span></h3>
+                                    ${item.notes ? `<p class="text-xs text-slate-500 mt-0.5 line-clamp-1">${escapeHtml(item.notes)}</p>` : ''}
+                                </div>
+                                <div class="leader-dots"></div>
+                                <div class="text-lg font-black text-slate-900 shrink-0">
+                                    HK$${parseFloat(item.price).toFixed(1)}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += `
+                <div class="mt-12 pt-6 border-t border-slate-200 text-center">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                        <i class="fa-solid fa-utensils mr-1"></i> GourmetLog - ${t('menu_footer_tag')}
+                    </p>
+                </div>
+            `;
+            
+            return html;
         }
 
         function exportMenuPDF() {
@@ -2042,88 +2059,26 @@
                 showToast(t('toast_pdf_no_data'), true);
                 return;
             }
-
-            const categories = ['mains', 'drinks', 'desserts', 'snacks'];
-            const todayStr = new Date().toISOString().slice(0, 10);
-
-            let htmlContent = `
-                <div class="border-4 border-slate-900 p-6 sm:p-8 rounded-3xl bg-white text-slate-900 space-y-6">
-                    <div class="text-center border-b-2 border-slate-900 pb-6 space-y-2">
-                        <span class="text-xs font-bold uppercase tracking-widest text-amber-600 border border-amber-500/40 bg-amber-50 px-3 py-1 rounded-full">${t('secret_menu_badge')}</span>
-                        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-1">${escapeHtml(restaurantName)}</h1>
-                        <p class="text-xs sm:text-sm font-medium text-slate-500">${t('menu_subtitle_pdf')} ‧ ${t('print_date')}: ${todayStr}</p>
-                    </div>
-
-                    <div class="space-y-6">
-            `;
-
-            categories.forEach(catKey => {
-                const catItems = foodItems.filter(item => getCategoryKey(item.category) === catKey);
-                if (catItems.length === 0) return;
-
-                const catLabel = t(`cat_${catKey}`);
-
-                htmlContent += `
-                    <div class="menu-page-break-avoid space-y-3">
-                        <div class="flex items-center gap-2 border-b-2 border-amber-500/30 pb-1">
-                            <h2 class="text-lg font-black text-slate-900 uppercase tracking-wide">${escapeHtml(catLabel)}</h2>
-                            <span class="text-xs text-amber-600 font-bold">(${catItems.length})</span>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                `;
-
-                catItems.forEach(item => {
-                    htmlContent += `
-                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80 gap-3">
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-baseline gap-2">
-                                    <h3 class="font-bold text-sm text-slate-900 truncate">${escapeHtml(item.title)}</h3>
-                                    <span class="text-xs text-amber-500 font-bold">★ ${item.rating}</span>
-                                </div>
-                                <p class="text-[11px] text-slate-500 truncate mt-0.5">${escapeHtml(item.location || t('no_location'))}</p>
-                            </div>
-                            <div class="text-right shrink-0 font-black text-slate-900 text-sm">
-                                HK$${parseFloat(item.price).toFixed(1)}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                htmlContent += `
-                        </div>
-                    </div>
-                `;
-            });
-
-            htmlContent += `
-                    </div>
-
-                    <div class="pt-6 border-t border-slate-200 flex flex-wrap justify-between items-center text-xs text-slate-400 font-medium gap-2">
-                        <span>GourmetLog v1.8 ‧ ${escapeHtml(restaurantName)}</span>
-                        <span>${t('menu_footer_tag')}</span>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('printableMenu').innerHTML = htmlContent;
-            document.getElementById('menuPreviewContent').innerHTML = htmlContent;
-
-            toggleDataModal();
-            openMenuPreviewModal();
-        }
-
-        function openMenuPreviewModal() {
-            const modal = document.getElementById('menuPreviewModal');
-            modal.classList.remove('hidden');
+            
+            const printHtml = generatePrintableHTML();
+            const printableContainer = document.getElementById('printableMenu');
+            const previewContainer = document.getElementById('menuPreviewContent');
+            
+            printableContainer.innerHTML = printHtml;
+            previewContainer.innerHTML = printHtml;
+            
+            closeDataModal();
+            
+            const previewModal = document.getElementById('menuPreviewModal');
+            previewModal.classList.remove('hidden');
             setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                trapFocus(modal);
+                previewModal.classList.remove('opacity-0');
+                trapFocus(previewModal);
             }, 10);
         }
 
         function closeMenuPreviewModal() {
             const modal = document.getElementById('menuPreviewModal');
-            if (modal.classList.contains('hidden')) return;
             modal.classList.add('opacity-0');
             releaseFocusTrap();
             setTimeout(() => {
@@ -2134,29 +2089,41 @@
         function triggerPrint() {
             window.print();
         }
-
+        
         function openPrintInNewWindow() {
-            const printContent = document.getElementById('printableMenu').innerHTML;
+            const printHtml = document.getElementById('printableMenu').innerHTML;
             const newWin = window.open('', '_blank');
+            if (!newWin) {
+                showToast('請允許彈出視窗以在新分頁開啟', true);
+                return;
+            }
+            
             newWin.document.write(`
                 <!DOCTYPE html>
-                <html>
+                <html lang="${currentLang}">
                 <head>
-                    <title>${escapeHtml(restaurantName)} - 專屬美食餐牌 PDF</title>
+                    <meta charset="UTF-8">
+                    <title>${restaurantName} - Menu Print</title>
                     <script src="https://cdn.tailwindcss.com"><\/script>
-                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
                     <style>
-                        body { font-family: 'Noto Sans TC', sans-serif; padding: 20px; background: white; color: black; }
+                        body { font-family: 'Noto Sans TC', sans-serif; background: #fff; color: #000; padding: 20px; }
+                        .leader-dots { flex-grow: 1; border-bottom: 2px dotted #94a3b8; margin: 0 12px; position: relative; top: -4px; }
+                        @media print {
+                            @page { margin: 15mm; }
+                            body { padding: 0; }
+                            button { display: none !important; }
+                        }
                     </style>
                 </head>
-                <body>
-                    ${printContent}
+                <body class="max-w-4xl mx-auto">
+                    <div class="mb-4 print:hidden flex justify-end">
+                        <button onclick="window.print()" class="px-4 py-2 bg-slate-900 text-white font-bold rounded-lg shadow cursor-pointer">列印餐牌 (Print)</button>
+                    </div>
+                    ${printHtml}
                     <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 500);
-                        };
+                        setTimeout(() => window.print(), 500);
                     <\/script>
                 </body>
                 </html>
