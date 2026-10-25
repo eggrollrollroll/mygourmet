@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GourmetLog - 美食秘菜單點餐紀錄系統 v1.8d</title>
+    <title>GourmetLog - 美食秘菜單點餐紀錄系統 v1.8d1</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -209,7 +209,7 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-40 sm:pb-36 flex flex-col md:flex-row gap-5">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-48 sm:pb-40 flex flex-col md:flex-row gap-5">
         <aside class="w-full md:w-60 shrink-0 space-y-4">
             <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-100">
                 <div class="flex items-center justify-between mb-3 px-1">
@@ -343,14 +343,14 @@
             </div>
             <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
                 <button onclick="deleteItemFromModal()" id="detailDeleteBtn" aria-label="刪除此紀錄" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all cursor-pointer">
-                    <i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> 刪除此紀錄
+                    <i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> <span id="detailDeleteBtnText">刪除此紀錄</span>
                 </button>
                 <div class="flex gap-2">
                     <button onclick="editCurrentItem()" id="detailEditBtn" aria-label="編輯紀錄" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">
-                        <i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> 編輯
+                        <i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> <span id="detailEditBtnText">編輯</span>
                     </button>
                     <button onclick="addToCartFromModal()" id="detailAddToCartBtn" aria-label="加入點單" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer">
-                        <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> 加入點單
+                        <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> <span id="detailAddToCartBtnText">加入點單</span>
                     </button>
                 </div>
             </div>
@@ -362,7 +362,7 @@
         <div id="addModalCard" class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[88vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3 shrink-0">
                 <h3 id="addModalTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> 新增美食點餐紀錄
+                    <i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> <span id="addModalTitleText">新增美食點餐紀錄</span>
                 </h3>
                 <button type="button" onclick="closeAddModal()" aria-label="關閉新增視窗" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -444,7 +444,7 @@
         <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] overflow-y-auto transform scale-95 transition-transform duration-200">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 id="statsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> 美食數據與消費統計
+                    <i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> <span id="statsTitleText">美食數據與消費統計</span>
                 </h3>
                 <button onclick="closeStatsModal()" aria-label="關閉統計" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -475,10 +475,10 @@
         <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] overflow-y-auto transform scale-95 transition-transform duration-200">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <h3 id="settingsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> 點餐系統設定
+                    <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> <span id="settingsTitle">點餐系統設定</span>
                     </h3>
-                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8d</span>
+                    <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8d1</span>
                 </div>
                 <button onclick="closeDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
@@ -510,7 +510,7 @@
                     </button>
                     <p id="exportIosNote" class="text-[10px] text-slate-400 text-center mt-1">iPhone：會開分享選單，請選「儲存到檔案」</p>
                 </div>
-                <label id="lblImportJSON" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <label class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all">
                     <i class="fa-solid fa-upload text-brand-600" aria-hidden="true"></i> <span id="lblImportJSONText">匯入 JSON 備份檔案</span>
                     <input type="file" accept=".json" onchange="importData(event)" class="hidden">
                 </label>
@@ -542,8 +542,8 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-28 sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 top-auto z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
+    <!-- Notification Toast (Raised above FAB) -->
+    <div id="toast" class="fixed bottom-36 sm:bottom-32 left-4 right-4 sm:left-auto sm:right-6 top-auto z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base shrink-0" aria-hidden="true"></i>
         <span id="toastMsg" class="text-xs sm:text-sm font-semibold leading-snug">提示訊息</span>
     </div>
@@ -626,7 +626,7 @@
                 avg_price_stat: "平均餐點單價",
                 cat_breakdown: "類別分佈",
                 close: "關閉",
-                settings_title: "點餐系統設定 & 資料管理",
+                settings_title: "點餐系統設定",
                 restaurant_name_label: "餐廳/點餐系統名稱",
                 save_name: "儲存名稱",
                 backup_desc: "系統已採用 IndexedDB 本機存儲技術突破容量限制。若需轉移設備，請先匯出 JSON，再於新版匯入以還原完整紀錄與相片。",
@@ -733,7 +733,7 @@
                 settings_title: "Settings & Data",
                 restaurant_name_label: "System Name",
                 save_name: "Save",
-                backup_desc: "Data is now safely stored via IndexedDB. Export JSON backup when changing devices, and Import on the new device to restore full records and photos.",
+                backup_desc: "Data is safely stored via IndexedDB. Export JSON backup when changing devices, and Import on the new device to restore full records and photos.",
                 export_pdf: "Export / Print Menu (PDF)",
                 export_json: "Export JSON Backup",
                 export_ios_note: "iPhone: Opens share sheet, select 'Save to Files'",
@@ -834,7 +834,7 @@
         }
 
         let foodItems = [];
-        let objectUrlsToRevoke = []; // manage memory for blobs
+        let objectUrlsToRevoke = [];
         let currentCategoryKey = 'all';
         let currentRatingFilter = 0;
         let currentRatingInput = 5;
@@ -844,7 +844,7 @@
         let currentTableCode = 'A-08';
         let pendingConfirmAction = null;
         let toastTimer = null;
-        let currentPhotoBlob = null; // Temp holder during form creation
+        let currentPhotoBlob = null;
 
         window.onload = async function() {
             document.documentElement.classList.add('overflow-y-hidden');
@@ -861,30 +861,33 @@
             try {
                 await loadItemsFromIDB();
             } catch (e) {
-                console.error("IDB load failed, trying defaults", e);
+                console.error("IDB load failed", e);
                 foodItems = [...defaultFoodItems];
+                foodItems.forEach(i => i._displayImage = i.image);
             }
             renderMenu();
         }
 
         async function loadItemsFromIDB() {
             const db = await openDB();
-            const items = await new Promise((resolve) => {
+            let items = await new Promise((resolve) => {
                 const tx = db.transaction('items', 'readonly');
                 const req = tx.objectStore('items').getAll();
                 req.onsuccess = () => resolve(req.result);
                 req.onerror = () => resolve([]);
             });
 
+            // Initialize defaults into IDB if empty, treating as clean first boot
+            if (items.length === 0) {
+                for (let item of defaultFoodItems) {
+                    await saveItemToIDB(item, null);
+                    items.push(item);
+                }
+            }
+
             // Cleanup old blob URLs
             objectUrlsToRevoke.forEach(url => URL.revokeObjectURL(url));
             objectUrlsToRevoke = [];
-
-            if (items.length === 0) {
-                // Try checking old localStorage migration ONCE via fallback if they never migrated, but per strict rules, we do NOT auto migrate.
-                foodItems = [...defaultFoodItems];
-                return;
-            }
 
             for (let item of items) {
                 if (item.image && item.image.startsWith('idb:')) {
@@ -898,9 +901,11 @@
                         const url = URL.createObjectURL(blob);
                         item._displayImage = url;
                         objectUrlsToRevoke.push(url);
+                    } else {
+                        item._displayImage = 'https://placehold.co/600x400/fff7ed/ea580c?text=GourmetLog';
                     }
                 } else {
-                    item._displayImage = item.image; // Fallback to http link
+                    item._displayImage = item.image; // Apply remote URL or default fallback string
                 }
             }
             
@@ -912,9 +917,8 @@
             return new Promise((resolve, reject) => {
                 const tx = db.transaction(['items', 'photos'], 'readwrite');
                 
-                // Clone item to avoid modifying the original array object unintentioanlly during IDB put
                 const itemToSave = { ...item };
-                delete itemToSave._displayImage; // Don't save transient property
+                delete itemToSave._displayImage; 
                 
                 if (blob) {
                     itemToSave.image = `idb:${item.id}`;
@@ -961,25 +965,97 @@
         }
 
         function updateLanguageUI() {
-            // ... (Abbreviated language switcher logic for brevity, identical to v1.8c) ...
+            // Welcome Screen
             document.getElementById('welcomeBadge').textContent = t('welcome_badge');
             document.getElementById('welcomeSubtitle').textContent = t('welcome_sub');
             document.getElementById('welcomeDiningLabel').textContent = t('dining_mode');
             document.getElementById('welcomeTableTag').textContent = t('table_prefix', { table: currentTableCode });
             document.getElementById('welcomeStartBtn').querySelector('span').textContent = t('start_ordering');
+            
+            // Header
             document.getElementById('headerLangText').textContent = currentLang === 'zh' ? 'EN' : '中文';
             document.getElementById('appHeaderBadge').textContent = t('secret_menu_badge');
             document.getElementById('appHeaderSubtitle').textContent = t('app_subtitle');
-            
-            // Dynamic translations for labels
+            document.getElementById('searchInput').placeholder = t('search_placeholder');
+            document.getElementById('searchInput').setAttribute('aria-label', t('search_placeholder'));
+            document.getElementById('mobileSearchInput').placeholder = t('search_placeholder');
+            document.getElementById('headerAddBtnText').textContent = t('add_record');
+            document.getElementById('headerAddBtnTextShort').textContent = t('add_record_short');
+
+            // Sidebar
+            document.getElementById('sidebarCatHeader').textContent = t('nav_categories');
+            document.getElementById('sidebarFilterHeader').textContent = t('sort_and_filters');
             document.getElementById('sortByLabel').textContent = t('sort_label');
             document.getElementById('sortOptNewest').textContent = t('sort_newest');
             document.getElementById('sortOptRating').textContent = t('sort_rating_desc');
             document.getElementById('sortOptPriceDesc').textContent = t('sort_price_desc');
             document.getElementById('sortOptPriceAsc').textContent = t('sort_price_asc');
+            document.getElementById('ratingFilterLabel').textContent = t('rating_filter_label');
+            document.getElementById('rf-0').textContent = t('rf_all');
+            document.getElementById('rf-5').textContent = t('rf_5');
+            document.getElementById('rf-4').textContent = t('rf_4');
+
+            // Main Content Area
+            document.getElementById('randomPickBtnText').textContent = t('random_pick');
+            document.getElementById('emptyStateTitle').textContent = t('no_items_title');
+            document.getElementById('emptyStateSub').textContent = t('no_items_sub');
+            document.getElementById('emptyStateBtnText').textContent = t('no_items_btn');
+
+            // Cart Drawer
+            document.getElementById('cartDrawerTitle').textContent = t('cart_title');
+            document.getElementById('cartTotalLabel').textContent = t('total_budget');
+            document.getElementById('clearCartBtn').textContent = t('clear_cart');
+            document.getElementById('confirmOrderBtn').textContent = t('confirm_order');
+
+            // Detail Modal
+            document.getElementById('detailNotesHeader').textContent = t('notes_label');
+            document.getElementById('detailDeleteBtnText').textContent = t('delete_record');
+            document.getElementById('detailEditBtnText').textContent = t('edit_record');
+            document.getElementById('detailAddToCartBtnText').textContent = t('add_to_cart');
+
+            // Add/Edit Modal
+            document.getElementById('addModalTitleText').textContent = t('add_modal_title');
+            document.getElementById('labelPhoto').textContent = t('photo_label');
+            document.getElementById('photoPlaceholderText').textContent = t('photo_placeholder');
+            document.getElementById('photoSubText').textContent = t('photo_sub');
+            document.getElementById('labelTitle').textContent = t('title_label');
+            document.getElementById('labelCategory').textContent = t('category_label');
+            document.getElementById('labelPrice').textContent = t('price_label');
+            document.getElementById('labelLocation').textContent = t('location_label');
+            document.getElementById('labelRating').textContent = t('rating_label');
+            document.getElementById('labelNotes').textContent = t('notes_label');
+            document.getElementById('inputTitle').placeholder = t('title_placeholder');
+            document.getElementById('inputLocation').placeholder = t('location_placeholder');
+            document.getElementById('inputNotes').placeholder = t('notes_placeholder');
+            document.getElementById('btnFormCancel').textContent = t('cancel');
+            document.getElementById('btnFormSave').textContent = t('save');
+            
+            // Stats Modal
+            document.getElementById('statsTitleText').textContent = t('stats_title');
+            document.getElementById('statTotalItemsLabel').textContent = t('total_items_stat');
+            document.getElementById('statAvgPriceLabel').textContent = t('avg_price_stat');
+            document.getElementById('statBreakdownLabel').textContent = t('cat_breakdown');
+            document.getElementById('statsCloseBtn').textContent = t('close');
+
+            // Settings Modal
+            document.getElementById('settingsTitle').textContent = t('settings_title');
+            document.getElementById('labelRestaurantName').textContent = t('restaurant_name_label');
+            document.getElementById('btnSaveRestName').textContent = t('save_name');
+            document.getElementById('backupDescText').textContent = t('backup_desc');
+            document.getElementById('btnExportPDFText').textContent = t('export_pdf');
+            document.getElementById('btnExportJSONText').textContent = t('export_json');
+            document.getElementById('exportIosNote').textContent = t('export_ios_note');
+            document.getElementById('lblImportJSONText').textContent = t('import_json');
+            document.getElementById('btnResetSampleText').textContent = t('reset_sample');
+            document.getElementById('dataFinishBtn').textContent = t('finish');
+
+            // Confirm Modal
+            document.getElementById('confirmModalCancelBtn').textContent = t('cancel');
+            document.getElementById('confirmModalActionBtn').textContent = t('confirm_exec');
 
             renderCategories();
             renderMenu();
+            updateCartUI(); // Ensures Empty message is translated
         }
 
         function setupGlobalAccessibility() {
@@ -1145,6 +1221,7 @@
             currentPhotoBlob = null; // Reset blob holder
 
             if (editItem) {
+                document.getElementById('addModalTitleText').textContent = t('edit_modal_title');
                 document.getElementById('editingItemId').value = editItem.id;
                 document.getElementById('inputTitle').value = editItem.title;
                 document.getElementById('inputCategory').value = editItem.category;
@@ -1159,6 +1236,7 @@
                     document.getElementById('imagePlaceholder').classList.add('hidden');
                 }
             } else {
+                document.getElementById('addModalTitleText').textContent = t('add_modal_title');
                 document.getElementById('editingItemId').value = '';
                 document.getElementById('imagePreview').classList.add('hidden');
                 document.getElementById('imagePlaceholder').classList.remove('hidden');
@@ -1221,11 +1299,12 @@
             const id = document.getElementById('editingItemId').value;
             const title = document.getElementById('inputTitle').value.trim();
             const category = document.getElementById('inputCategory').value;
-            const price = parseFloat(document.getElementById('inputPrice').value) || 0;
+            const price = parseFloat(document.getElementById('inputPrice').value);
             const location = document.getElementById('inputLocation').value.trim();
             const notes = document.getElementById('inputNotes').value.trim();
 
             if (!title) return showToast(t('toast_invalid_name'), true);
+            if (isNaN(price) || price < 0) return showToast(t('toast_invalid_price'), true);
 
             const now = new Date();
             const formattedDate = now.toISOString().split('T')[0];
@@ -1269,7 +1348,7 @@
             openConfirmModal(t('confirm_delete_title'), t('confirm_delete_msg'));
         }
 
-        // --- Utility UI ---
+        // --- Utility UI & Stats ---
 
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
@@ -1363,10 +1442,36 @@
         }
         function closeDataModal() { const m = document.getElementById('dataModal'); m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 200); }
 
+        function calculateStats() {
+            document.getElementById('statTotalItems').textContent = foodItems.length;
+            const total = foodItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+            const avg = foodItems.length > 0 ? (total / foodItems.length).toFixed(1) : '0.0';
+            document.getElementById('statAvgPrice').textContent = `HK$${avg}`;
+
+            const counts = {};
+            foodItems.forEach(item => {
+                const cat = getCategoryKey(item.category);
+                counts[cat] = (counts[cat] || 0) + 1;
+            });
+            
+            const bdHtml = Object.keys(counts).map(cat => `
+                <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-slate-600 font-semibold text-xs">${escapeHtml(t(`cat_${cat}`))}</span>
+                    <span class="text-brand-600 font-black text-sm">${counts[cat]}</span>
+                </div>
+            `).join('');
+            document.getElementById('categoryBreakdown').innerHTML = bdHtml || '<p class="text-slate-400 text-center py-2 text-xs">暫無數據</p>';
+        }
+
         function toggleStatsModal() {
             const m = document.getElementById('statsModal');
-            if (m.classList.contains('hidden')) { m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10); } 
-            else closeStatsModal();
+            if (m.classList.contains('hidden')) { 
+                calculateStats();
+                m.classList.remove('hidden'); 
+                setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10); 
+            } else {
+                closeStatsModal();
+            }
         }
         function closeStatsModal() { const m = document.getElementById('statsModal'); m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 200); }
 
@@ -1405,7 +1510,7 @@
         }
 
         async function exportData() {
-            if (foodItems.length === 0) return showToast(t('toast_no_data'), true);
+            if (foodItems.length === 0) return showToast(t('toast_no_data') || "無資料可匯出", true);
             
             showToast("正在準備匯出備份...");
             const exportArray = [];
