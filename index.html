@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-HK" class="overflow-x-hidden">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GourmetLog - 美食秘菜單點餐紀錄系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GourmetLog - 美食秘菜單點餐紀錄系統 v1.8</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -14,6 +14,13 @@
     <script>
         tailwind.config = {
             theme: {
+                screens: {
+                    'xs': '375px',
+                    'sm': '640px',
+                    'md': '768px',
+                    'lg': '1024px',
+                    'xl': '1280px',
+                },
                 extend: {
                     colors: {
                         brand: {
@@ -35,6 +42,13 @@
         }
     </script>
     <style>
+        /* Prevent horizontal overflow on page */
+        html, body {
+            overflow-x: hidden !important;
+            width: 100%;
+            max-width: 100vw;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -65,7 +79,7 @@
             animation: pulseGlow 2.5s infinite ease-in-out;
         }
 
-        /* 專屬實體餐牌 PDF / 列印樣式 */
+        /* Dedicated Menu Print / PDF Export Styles */
         @media print {
             body {
                 background: #ffffff !important;
@@ -97,11 +111,11 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white max-w-full overflow-x-hidden">
 
-    <!-- Welcome / Start Ordering Splash Screen -->
-    <div id="welcomeScreen" role="dialog" aria-modal="true" aria-label="點餐系統歡迎畫面" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center text-white transition-all duration-500">
-        <div class="max-w-md w-full bg-slate-900/80 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-md flex flex-col items-center space-y-6">
+    <!-- Welcome / Start Ordering Splash Screen (z-[150] to overlay floating elements on small screens) -->
+    <div id="welcomeScreen" role="dialog" aria-modal="true" aria-label="點餐系統歡迎畫面" class="fixed inset-0 z-[150] bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white transition-all duration-300">
+        <div class="max-w-md w-full bg-slate-900/90 border border-slate-800 p-5 sm:p-8 rounded-3xl shadow-2xl backdrop-blur-md flex flex-col items-center space-y-4 sm:space-y-6 max-h-[92vh] overflow-y-auto my-auto">
             
             <!-- Language Switcher Pill on Start Screen -->
             <div class="flex items-center gap-1 bg-slate-800/90 p-1 rounded-2xl border border-slate-700/80 text-xs font-bold w-full justify-center">
@@ -113,52 +127,54 @@
                 </button>
             </div>
 
-            <!-- Restaurant Badge / Logo -->
-            <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white text-3xl shadow-lg shadow-brand-500/30 glow-effect">
+            <!-- Restaurant Logo Badge -->
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white text-2xl sm:text-3xl shadow-lg shadow-brand-500/30 glow-effect shrink-0">
                 <i class="fa-solid fa-utensils" aria-hidden="true"></i>
             </div>
 
-            <!-- Title & Subtitle -->
-            <div class="space-y-2">
-                <span id="welcomeBadge" class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-widest">自助點餐 & 美食紀錄系統</span>
-                <h1 id="welcomeRestaurantTitle" class="text-2xl sm:text-3xl font-black text-white tracking-tight">荃港大冰室</h1>
-                <p id="welcomeSubtitle" class="text-xs sm:text-sm text-slate-400 font-medium">歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食</p>
+            <!-- Title & Subtitle + Kicker Badge (Fix: Wrap long English text cleanly in badge) -->
+            <div class="space-y-2 w-full">
+                <span id="welcomeBadge" class="px-3 py-1 bg-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-bold rounded-xl sm:rounded-full border border-amber-500/30 uppercase tracking-normal sm:tracking-widest max-w-full inline-block text-center whitespace-normal leading-tight break-words">
+                    自助點餐 & 美食紀錄系統
+                </span>
+                <h1 id="welcomeRestaurantTitle" class="text-xl sm:text-3xl font-black text-white tracking-tight truncate px-2">荃港大冰室</h1>
+                <p id="welcomeSubtitle" class="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed">歡迎光臨！請點擊下方按鈕開始瀏覽秘菜單與紀錄美食</p>
             </div>
 
-            <!-- Table Number / Mode Selector -->
-            <div class="w-full bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs font-semibold text-slate-300">
+            <!-- Table Number / Mode Tag -->
+            <div class="w-full bg-slate-800/80 p-2.5 sm:p-3 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs font-semibold text-slate-300">
                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-chair text-amber-400" aria-hidden="true"></i> <span id="welcomeDiningLabel">用餐型態</span></span>
                 <span id="welcomeTableTag" class="bg-brand-600 text-white px-2.5 py-1 rounded-lg font-bold">堂食 / A-08 桌</span>
             </div>
 
-            <!-- Big Start Ordering Button -->
-            <button onclick="startOrdering()" id="welcomeStartBtn" aria-label="開始點餐" class="w-full py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer">
+            <!-- Big Start Ordering Button (Fix: High visibility & safe touch padding for ≤360px) -->
+            <button onclick="startOrdering()" id="welcomeStartBtn" aria-label="開始點餐" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer shrink-0">
                 <span>開始點餐</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
             </button>
         </div>
     </div>
 
-    <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+    <!-- Top Navigation Header (Fix: Responsive tight layout, no horizontal overflow) -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs w-full max-w-full overflow-hidden">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             
-            <!-- Brand Logo & Secret Mode Indicator -->
-            <div class="flex items-center gap-3 cursor-pointer" onclick="showWelcomeScreen()" role="button" aria-label="返回點餐歡迎畫面">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
-                    <i class="fa-solid fa-utensils text-lg" aria-hidden="true"></i>
+            <!-- Brand Logo & System Title -->
+            <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink min-w-0" onclick="showWelcomeScreen()" role="button" aria-label="返回點餐歡迎畫面">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-amber-500 to-orange-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0">
+                    <i class="fa-solid fa-utensils text-base sm:text-lg" aria-hidden="true"></i>
                 </div>
-                <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                        <h1 id="appHeaderTitle" class="text-base sm:text-lg font-black text-slate-900 leading-none truncate">荃港大冰室</h1>
-                        <span id="appHeaderBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200/60 hidden sm:inline-block shrink-0">秘菜單 ‧ 美食誌</span>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                        <h1 id="appHeaderTitle" class="text-sm sm:text-lg font-black text-slate-900 leading-none truncate max-w-[110px] xs:max-w-[150px] sm:max-w-none">荃港大冰室</h1>
+                        <span id="appHeaderBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-amber-200/60 hidden lg:inline-block shrink-0">秘菜單 ‧ 美食誌</span>
                     </div>
-                    <p id="appHeaderSubtitle" class="text-[11px] text-slate-500 font-medium mt-0.5 truncate">個人數位美食紀錄系統</p>
+                    <p id="appHeaderSubtitle" class="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 truncate hidden xs:block">個人數位美食紀錄系統</p>
                 </div>
             </div>
 
-            <!-- Search Bar (Desktop) -->
-            <div class="flex-1 max-w-md hidden md:block">
+            <!-- Desktop Search Bar -->
+            <div class="flex-1 max-w-xs md:max-w-md hidden md:block">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" aria-hidden="true"></i>
                     <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜尋食品、餐廳或心得標籤..." aria-label="搜尋食品、餐廳或心得標籤"
@@ -169,51 +185,51 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Action Buttons Row (Fix: Compact spacing on mobile to avoid overflow) -->
+            <div class="flex items-center gap-1 sm:gap-2 shrink-0">
                 <!-- Header Language Switcher Button -->
-                <button onclick="toggleLanguage()" id="headerLangBtn" class="px-2.5 py-1.5 text-slate-700 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer text-xs font-extrabold border border-slate-200 flex items-center gap-1" title="切換介面語言 / Switch Language">
-                    <i class="fa-solid fa-globe text-brand-600" aria-hidden="true"></i>
+                <button onclick="toggleLanguage()" id="headerLangBtn" class="px-2 py-1.5 sm:px-2.5 text-slate-700 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer text-xs font-extrabold border border-slate-200 flex items-center gap-1" title="切換介面語言 / Switch Language">
+                    <i class="fa-solid fa-globe text-brand-600 text-xs" aria-hidden="true"></i>
                     <span id="headerLangText">EN</span>
                 </button>
 
-                <button onclick="showWelcomeScreen()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="回到點餐歡迎頁面" aria-label="回到點餐歡迎頁面">
-                    <i class="fa-solid fa-house text-base sm:text-lg" aria-hidden="true"></i>
+                <button onclick="showWelcomeScreen()" class="p-2 sm:p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="回到點餐歡迎頁面" aria-label="回到點餐歡迎頁面">
+                    <i class="fa-solid fa-house text-sm sm:text-lg" aria-hidden="true"></i>
                 </button>
 
-                <button onclick="openAddModal()" aria-label="新增美食記錄" class="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm shadow-brand-500/20 transition-all duration-150 cursor-pointer">
+                <button onclick="openAddModal()" aria-label="新增美食記錄" class="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm shadow-brand-500/20 transition-all duration-150 cursor-pointer">
                     <i class="fa-solid fa-plus text-xs" aria-hidden="true"></i>
                     <span id="headerAddBtnText" class="hidden sm:inline">新增美食記錄</span>
                     <span id="headerAddBtnTextShort" class="sm:hidden">紀錄</span>
                 </button>
 
-                <button onclick="toggleStatsModal()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="食評與數據統計" aria-label="查看食評與數據統計">
-                    <i class="fa-solid fa-chart-pie text-base sm:text-lg" aria-hidden="true"></i>
+                <button onclick="toggleStatsModal()" class="p-2 sm:p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="食評與數據統計" aria-label="查看食評與數據統計">
+                    <i class="fa-solid fa-chart-pie text-sm sm:text-lg" aria-hidden="true"></i>
                 </button>
 
-                <button onclick="toggleDataModal()" class="p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="系統設定 & 資料管理" aria-label="開啟系統設定與資料管理">
-                    <i class="fa-solid fa-gear text-base sm:text-lg" aria-hidden="true"></i>
+                <button onclick="toggleDataModal()" class="p-2 sm:p-2.5 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer" title="系統設定 & 資料管理" aria-label="開啟系統設定與資料管理">
+                    <i class="fa-solid fa-gear text-sm sm:text-lg" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Search Bar -->
-        <div class="px-4 pb-3 md:hidden">
+        <div class="px-3 pb-2.5 md:hidden">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" aria-hidden="true"></i>
                 <input type="text" id="mobileSearchInput" oninput="handleSearch()" placeholder="搜尋食品、餐廳或標籤..." aria-label="搜尋食品、餐廳或標籤"
-                    class="w-full pl-9 pr-4 py-2 bg-slate-100 border border-transparent focus:border-brand-500 focus:bg-white focus:outline-none rounded-xl text-xs transition-all">
+                    class="w-full pl-9 pr-4 py-1.5 bg-slate-100 border border-transparent focus:border-brand-500 focus:bg-white focus:outline-none rounded-xl text-xs transition-all">
             </div>
         </div>
     </header>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-36 sm:pb-32 flex flex-col md:flex-row gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-36 sm:pb-32 flex flex-col md:flex-row gap-5">
         
         <!-- Sidebar / Category Selector -->
         <aside class="w-full md:w-60 shrink-0 space-y-4">
             <!-- Category Menu Navigation -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+            <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-100">
                 <div class="flex items-center justify-between mb-3 px-1">
                     <h2 id="sidebarCatHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
                     <span id="totalItemsBadge" class="text-[11px] font-extrabold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0 項</span>
@@ -224,7 +240,7 @@
             </div>
 
             <!-- Sorting & Quick Filters -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
+            <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-100 space-y-3">
                 <h2 id="sidebarFilterHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">排序與精選</h2>
                 <div>
                     <label id="sortByLabel" for="sortBy" class="block text-xs font-semibold text-slate-600 mb-1.5">排序方式</label>
@@ -250,23 +266,23 @@
         <!-- Right Content: Food Card Grid -->
         <section class="flex-1">
             <!-- Menu Top Header Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-5">
                 <div>
-                    <h2 id="currentCategoryTitle" class="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+                    <h2 id="currentCategoryTitle" class="text-lg sm:text-2xl font-black text-slate-900 flex items-center gap-2">
                         <span>全部食品</span>
                     </h2>
-                    <p id="itemCountText" class="text-xs text-slate-500 mt-1">載入中...</p>
+                    <p id="itemCountText" class="text-xs text-slate-500 mt-0.5">載入中...</p>
                 </div>
 
-                <!-- Random Pick Button for indecisive eaters -->
-                <button onclick="pickRandomFood()" aria-label="是日推介隨機抽選美食" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-500/30 flex items-center gap-2 transition-all cursor-pointer">
+                <!-- Random Pick Button -->
+                <button onclick="pickRandomFood()" aria-label="是日推介隨機抽選美食" class="px-3 py-2 sm:px-3.5 sm:py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-500/30 flex items-center gap-2 transition-all cursor-pointer">
                     <i class="fa-solid fa-dice text-sm" aria-hidden="true"></i>
                     <span id="randomPickBtnText">是日推介</span>
                 </button>
             </div>
 
             <!-- Food Grid Container -->
-            <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <!-- Food cards injected dynamically -->
             </div>
 
@@ -286,20 +302,20 @@
         </section>
     </main>
 
-    <!-- Floating Cart Button -->
-    <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-24 right-5 sm:right-6 z-[90] w-14 h-14 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
-        <i class="fa-solid fa-cart-shopping text-xl sm:text-2xl" aria-hidden="true"></i>
+    <!-- Floating Cart FAB (Fix: Elevated bottom/right inset to sit clearly above Netlify badge & bottom bars) -->
+    <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[80] w-13 h-13 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
+        <i class="fa-solid fa-cart-shopping text-lg sm:text-2xl" aria-hidden="true"></i>
         <span id="floatingCartBadge" class="hidden absolute -top-1 -right-1 bg-amber-400 text-slate-900 font-black text-xs sm:text-sm w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 border-white shadow-md">0</span>
     </button>
 
-    <!-- Slide-over Cart Drawer -->
+    <!-- Slide-over Cart Drawer (Fix: Safe bottom padding so submit/clear buttons aren't blocked) -->
     <div id="cartDrawer" role="dialog" aria-modal="true" aria-label="今日點單購物車" class="fixed inset-y-0 right-0 z-[100] w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col hidden" aria-hidden="true">
-        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
             <div class="flex items-center gap-2.5">
                 <i class="fa-solid fa-receipt text-amber-400 text-lg" aria-hidden="true"></i>
                 <h3 id="cartDrawerTitle" class="font-bold text-base">今日點單清單</h3>
             </div>
-            <button onclick="toggleCartDrawer()" aria-label="關閉購物車" class="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer">
+            <button onclick="toggleCartDrawer()" aria-label="關閉購物車" class="text-slate-400 hover:text-white p-2 rounded-lg transition-colors cursor-pointer">
                 <i class="fa-solid fa-xmark text-xl" aria-hidden="true"></i>
             </button>
         </div>
@@ -308,7 +324,7 @@
             <!-- Cart items injected dynamically -->
         </div>
 
-        <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 space-y-3 pb-28 sm:pb-24">
+        <div class="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 space-y-3 pb-24 sm:pb-20 shrink-0">
             <div class="flex justify-between items-center text-sm">
                 <span id="cartTotalLabel" class="font-bold text-slate-600">總計預算金額</span>
                 <span id="cartTotal" class="text-xl font-black text-brand-600">HK$0.0</span>
@@ -325,9 +341,9 @@
     </div>
 
     <!-- Food Detail Modal -->
-    <div id="detailModal" role="dialog" aria-modal="true" aria-label="美食詳細資訊" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
-        <div id="detailModalCard" class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]">
-            <div class="relative h-60 bg-slate-100">
+    <div id="detailModal" role="dialog" aria-modal="true" aria-label="美食詳細資訊" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div id="detailModalCard" class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[88vh]">
+            <div class="relative h-52 sm:h-60 bg-slate-100 shrink-0">
                 <img id="detailImg" alt="美食相片" class="w-full h-full object-cover">
                 <button onclick="closeDetailModal()" aria-label="關閉詳細資訊" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900/60 text-white flex items-center justify-center hover:bg-slate-900 transition-colors cursor-pointer">
                     <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -338,14 +354,14 @@
             <div class="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
                 <div class="flex justify-between items-start gap-3">
                     <div>
-                        <h3 id="detailTitle" class="text-xl font-black text-slate-900"></h3>
+                        <h3 id="detailTitle" class="text-lg sm:text-xl font-black text-slate-900"></h3>
                         <p id="detailLocation" class="text-xs text-slate-500 mt-1 flex items-center gap-1">
                             <i class="fa-solid fa-location-dot text-brand-500" aria-hidden="true"></i>
                             <span></span>
                         </p>
                     </div>
                     <div class="text-right shrink-0">
-                        <span id="detailPrice" class="text-xl font-black text-brand-600"></span>
+                        <span id="detailPrice" class="text-lg sm:text-xl font-black text-brand-600"></span>
                         <div id="detailStars" class="flex items-center gap-0.5 text-amber-400 text-xs mt-0.5"></div>
                     </div>
                 </div>
@@ -359,7 +375,7 @@
                 </div>
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
                 <button onclick="deleteItemFromModal()" id="detailDeleteBtn" aria-label="刪除此紀錄" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all cursor-pointer">
                     <i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> 刪除此紀錄
                 </button>
@@ -375,28 +391,28 @@
         </div>
     </div>
 
-    <!-- Add / Edit Food Record Modal -->
-    <div id="addModal" role="dialog" aria-modal="true" aria-label="新增或編輯美食紀錄" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
-        <div id="addModalCard" class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+    <!-- Add / Edit Food Record Modal (Fix: Scrollable form body so save button is never hidden) -->
+    <div id="addModal" role="dialog" aria-modal="true" aria-label="新增或編輯美食紀錄" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div id="addModalCard" class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[88vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3 shrink-0">
                 <h3 id="addModalTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-camera text-brand-600" aria-hidden="true"></i> 新增美食點餐紀錄
                 </h3>
-                <button onclick="closeAddModal()" aria-label="關閉新增視窗" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button onclick="closeAddModal()" aria-label="關閉新增視窗" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <form id="foodForm" onsubmit="handleFormSubmit(event)" class="space-y-3.5">
+            <form id="foodForm" onsubmit="handleFormSubmit(event)" class="space-y-3.5 overflow-y-auto flex-1 pr-1 pb-2">
                 <input type="hidden" id="editingItemId">
 
                 <!-- Image Upload & Camera Capture -->
                 <div>
                     <label id="labelPhoto" class="block text-xs font-bold text-slate-700 mb-1.5">相片 (拍照 / 相冊選擇)</label>
-                    <div class="relative h-36 bg-slate-50 border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden group">
+                    <div class="relative h-32 sm:h-36 bg-slate-50 border-2 border-dashed border-slate-200 hover:border-brand-500 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors overflow-hidden group">
                         <input type="file" accept="image/*" onchange="previewAndCompressImage(event)" aria-label="上載相片" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                         <img id="imagePreview" alt="相片預覽" class="hidden absolute inset-0 w-full h-full object-cover">
-                        <div id="imagePlaceholder" class="text-center space-y-1">
+                        <div id="imagePlaceholder" class="text-center space-y-1 p-2">
                             <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-brand-500 transition-colors" aria-hidden="true"></i>
                             <p id="photoPlaceholderText" class="text-xs font-semibold text-slate-500">點擊拍照或上載食品相片</p>
                             <p id="photoSubText" class="text-[10px] text-slate-400">（系統將自動智慧壓縮相片）</p>
@@ -454,7 +470,7 @@
                     <textarea id="inputNotes" rows="2" placeholder="記下湯底濃郁度、配料建議或再訪指數..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-brand-500"></textarea>
                 </div>
 
-                <div class="pt-2 flex gap-2">
+                <div class="pt-2 flex gap-2 shrink-0">
                     <button type="button" onclick="closeAddModal()" id="btnFormCancel" class="w-1/3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all cursor-pointer">取消</button>
                     <button type="submit" id="btnFormSave" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md shadow-brand-500/20 transition-all cursor-pointer">儲存美食紀錄</button>
                 </div>
@@ -463,13 +479,13 @@
     </div>
 
     <!-- Statistics Modal -->
-    <div id="statsModal" role="dialog" aria-modal="true" aria-label="美食數據與消費統計" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+    <div id="statsModal" role="dialog" aria-modal="true" aria-label="美食數據與消費統計" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 id="statsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> 美食數據與消費統計
                 </h3>
-                <button onclick="toggleStatsModal()" aria-label="關閉統計" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button onclick="toggleStatsModal()" aria-label="關閉統計" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
                 </button>
             </div>
@@ -498,9 +514,9 @@
         </div>
     </div>
 
-    <!-- Data Import / Export & Settings Backup Modal -->
-    <div id="dataModal" role="dialog" aria-modal="true" aria-label="系統設定與資料管理" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+    <!-- Data Import / Export Modal -->
+    <div id="dataModal" role="dialog" aria-modal="true" aria-label="系統設定與資料管理" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[88vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
                     <h3 id="settingsTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
@@ -508,7 +524,7 @@
                     </h3>
                     <span class="text-[10px] font-extrabold bg-brand-50 text-brand-600 px-2 py-0.5 rounded-md border border-brand-200">v1.8</span>
                 </div>
-                <button onclick="toggleDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button onclick="toggleDataModal()" aria-label="關閉設定" class="text-slate-400 hover:text-slate-600 cursor-pointer p-1">
                     <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
                 </button>
             </div>
@@ -554,7 +570,7 @@
     </div>
 
     <!-- Custom Confirmation Dialog -->
-    <div id="confirmModal" role="dialog" aria-modal="true" aria-label="確認對話框" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+    <div id="confirmModal" role="dialog" aria-modal="true" aria-label="確認對話框" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[130] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
         <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl text-center space-y-4 transform scale-95 transition-transform duration-200">
             <div class="w-12 h-12 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
                 <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
@@ -570,17 +586,17 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed top-4 left-4 right-4 sm:top-auto sm:bottom-24 sm:left-auto sm:right-6 z-[110] bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform -translate-y-12 sm:translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base" aria-hidden="true"></i>
-        <span id="toastMsg" class="text-xs sm:text-sm font-semibold">提示訊息</span>
+    <!-- Notification Toast (Fix: Placed below sticky header on mobile so top right & drawer close remain unobstructed) -->
+    <div id="toast" class="fixed top-20 sm:top-auto sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base shrink-0" aria-hidden="true"></i>
+        <span id="toastMsg" class="text-xs sm:text-sm font-semibold leading-snug">提示訊息</span>
     </div>
 
     <!-- Printable Menu Container for PDF Export -->
     <div id="printableMenu" class="hidden print:block bg-white text-slate-900 p-8 max-w-4xl mx-auto"></div>
 
     <!-- Menu Preview & Print Modal -->
-    <div id="menuPreviewModal" role="dialog" aria-modal="true" aria-label="餐牌預覽與列印" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex flex-col items-center justify-start p-3 sm:p-6 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
+    <div id="menuPreviewModal" role="dialog" aria-modal="true" aria-label="餐牌預覽與列印" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[120] flex flex-col items-center justify-start p-3 sm:p-6 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
         <div class="w-full max-w-4xl bg-slate-900 text-white rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-2xl sticky top-0 z-20 border border-slate-700">
             <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
@@ -741,14 +757,14 @@
                 confirm_reset_msg: "這將會覆蓋你目前的紀錄並回復範例資料。"
             },
             en: {
-                welcome_badge: "Self-Ordering & Gourmet Log System",
+                welcome_badge: "Self-Ordering & Gourmet Log",
                 welcome_sub: "Welcome! Click below to browse the secret menu and log your gourmet dishes",
                 dining_mode: "Dining Mode",
                 table_prefix: "Dine-in / Table {table}",
                 start_ordering: "Start Ordering",
                 secret_menu_badge: "Secret Menu · Food Log",
                 app_subtitle: "Personal Gourmet Logging System",
-                search_placeholder: "Search dishes, restaurants, or notes...",
+                search_placeholder: "Search dishes, locations, notes...",
                 add_record: "Add Gourmet Record",
                 add_record_short: "Log",
                 nav_categories: "Menu Categories",
@@ -792,7 +808,7 @@
                 edit_modal_title: "Edit Gourmet Record",
                 photo_label: "Photo (Camera / Gallery)",
                 photo_placeholder: "Click to take photo or upload image",
-                photo_sub: "(Image will be compressed automatically)",
+                photo_sub: "(Image compressed automatically)",
                 title_label: "Dish Name *",
                 category_label: "Category *",
                 price_label: "Price (HK$) *",
@@ -808,11 +824,11 @@
                 avg_price_stat: "Avg Item Price",
                 cat_breakdown: "Category Breakdown",
                 close: "Close",
-                settings_title: "System Settings & Data Management",
+                settings_title: "System Settings & Data",
                 restaurant_name_label: "Restaurant / System Name",
                 save_name: "Save Name",
                 backup_desc: "Backup your food log anytime or import a JSON backup file to seamlessly preserve your records across devices.",
-                export_pdf: "Export / Print Restaurant Menu (PDF)",
+                export_pdf: "Export / Print Menu (PDF)",
                 export_json: "Export JSON Backup File",
                 export_ios_note: "iPhone: Opens share sheet, select 'Save to Files'",
                 import_json: "Import JSON Backup File",
@@ -957,7 +973,7 @@
         let pendingConfirmAction = null;
         let toastTimer = null;
 
-        // Focus Trap Module
+        // Focus Trap Module for Modals
         let activeFocusTrap = null;
         let previousFocusedElement = null;
 
@@ -1247,7 +1263,7 @@
             setTimeout(() => {
                 welcome.classList.add('hidden');
                 welcome.setAttribute('aria-hidden', 'true');
-            }, 500);
+            }, 300);
         }
 
         function showWelcomeScreen() {
@@ -1279,7 +1295,7 @@
                 const label = t(`cat_${cat.key}`);
 
                 return `
-                    <button onclick="selectCategory('${cat.key}')" aria-label="${label}" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all cursor-pointer ${activeClasses}">
+                    <button onclick="selectCategory('${cat.key}')" aria-label="${label}" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm whitespace-nowrap transition-all cursor-pointer ${activeClasses}">
                         <i class="fa-solid ${cat.icon} text-xs" aria-hidden="true"></i>
                         <span>${escapeHtml(label)}</span>
                     </button>
@@ -1364,7 +1380,7 @@
 
             grid.innerHTML = filtered.map(item => `
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
-                    <div class="relative h-44 bg-slate-100 overflow-hidden cursor-pointer" onclick="openDetailModal('${escapeHtml(item.id)}')">
+                    <div class="relative h-40 sm:h-44 bg-slate-100 overflow-hidden cursor-pointer" onclick="openDetailModal('${escapeHtml(item.id)}')">
                         <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                              onerror="this.src='https://placehold.co/600x400/fff7ed/ea580c?text=GourmetLog'">
                         <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xs">
@@ -1376,7 +1392,7 @@
                         </div>
                     </div>
 
-                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                    <div class="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
                         <div>
                             <h3 onclick="openDetailModal('${escapeHtml(item.id)}')" class="font-bold text-slate-900 text-sm sm:text-base leading-snug cursor-pointer hover:text-brand-600 transition-colors line-clamp-1">
                                 ${escapeHtml(item.title)}
@@ -1387,7 +1403,7 @@
                             </p>
                         </div>
 
-                        <div class="pt-2.5 border-t border-slate-50 flex items-center justify-between">
+                        <div class="pt-2 border-t border-slate-50 flex items-center justify-between">
                             <div>
                                 <p class="text-base sm:text-lg font-black text-slate-900">HK$${parseFloat(item.price).toFixed(1)}</p>
                             </div>
@@ -1458,7 +1474,6 @@
                 document.getElementById('editingItemId').value = editItem.id;
                 document.getElementById('inputTitle').value = editItem.title;
                 
-                // Set option matching canonical key or category name
                 const catKey = getCategoryKey(editItem.category);
                 const selectEl = document.getElementById('inputCategory');
                 if (catKey === 'mains') selectEl.value = '主食';
@@ -1524,13 +1539,10 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            showToast(t('toast_compressing'), false);
-
+            showToast(t('toast_compressing'));
             const reader = new FileReader();
-            reader.readAsDataURL(file);
             reader.onload = function(e) {
                 const img = new Image();
-                img.src = e.target.result;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
@@ -1554,23 +1566,23 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
-
-                    const previewImg = document.getElementById('imagePreview');
-                    previewImg.src = compressedBase64;
-                    previewImg.classList.remove('hidden');
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('imagePreview').src = compressedDataUrl;
+                    document.getElementById('imagePreview').classList.remove('hidden');
                     document.getElementById('imagePlaceholder').classList.add('hidden');
                     showToast(t('toast_compressed'));
                 };
+                img.src = e.target.result;
             };
+            reader.readAsDataURL(file);
         }
 
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const editId = document.getElementById('editingItemId').value;
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editingItemId').value;
             const title = document.getElementById('inputTitle').value.trim();
             const category = document.getElementById('inputCategory').value;
-            const rawPrice = parseFloat(document.getElementById('inputPrice').value);
+            const price = parseFloat(document.getElementById('inputPrice').value) || 0;
             const location = document.getElementById('inputLocation').value.trim();
             const notes = document.getElementById('inputNotes').value.trim();
             const previewSrc = document.getElementById('imagePreview').src;
@@ -1579,55 +1591,101 @@
                 showToast(t('toast_invalid_name'), true);
                 return;
             }
-            if (isNaN(rawPrice) || rawPrice < 0) {
-                showToast(t('toast_invalid_price'), true);
-                return;
-            }
-            const price = rawPrice;
 
-            const image = (previewSrc && !previewSrc.endsWith('index.html')) 
+            const imgUrl = (previewSrc && !previewSrc.includes('window.location.href')) 
                 ? previewSrc 
-                : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80';
+                : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
 
-            if (editId) {
-                const index = foodItems.findIndex(i => i.id === editId);
+            const now = new Date();
+            const formattedDate = now.toISOString().split('T')[0];
+
+            if (id) {
+                // Update Existing
+                const index = foodItems.findIndex(i => i.id === id);
                 if (index !== -1) {
                     foodItems[index] = {
                         ...foodItems[index],
-                        title, category, price, location, notes, image,
-                        rating: currentRatingInput
+                        title, category, price, location, notes,
+                        rating: currentRatingInput,
+                        image: imgUrl
                     };
                     showToast(t('toast_updated'));
                 }
             } else {
+                // Create New
                 const newItem = {
                     id: Date.now().toString(),
-                    title,
-                    category,
-                    price,
-                    location,
-                    notes,
-                    image,
+                    title, category, price, location, notes,
                     rating: currentRatingInput,
-                    date: new Date().toISOString().split('T')[0]
+                    image: imgUrl,
+                    date: formattedDate
                 };
                 foodItems.unshift(newItem);
                 showToast(t('toast_added'));
             }
 
             saveItems();
-            closeAddModal();
-            renderCategories();
             renderMenu();
+            closeAddModal();
+        }
+
+        function editCurrentItem() {
+            if (!activeModalItemId) return;
+            const item = foodItems.find(i => i.id === activeModalItemId);
+            if (item) {
+                closeDetailModal();
+                setTimeout(() => openAddModal(item), 200);
+            }
+        }
+
+        function deleteItemFromModal() {
+            if (!activeModalItemId) return;
+            showConfirmModal(
+                t('confirm_delete_title'),
+                t('confirm_delete_msg'),
+                () => {
+                    foodItems = foodItems.filter(i => i.id !== activeModalItemId);
+                    saveItems();
+                    renderMenu();
+                    closeDetailModal();
+                    showToast(t('toast_deleted'));
+                }
+            );
+        }
+
+        // Floating Cart Drawer Logic
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                drawer.removeAttribute('aria-hidden');
+                setTimeout(() => {
+                    drawer.classList.remove('translate-x-full');
+                    trapFocus(drawer);
+                }, 10);
+            } else {
+                closeCartDrawer();
+            }
+        }
+
+        function closeCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            if (drawer.classList.contains('hidden')) return;
+            drawer.classList.add('translate-x-full');
+            releaseFocusTrap();
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+                drawer.setAttribute('aria-hidden', 'true');
+            }, 300);
         }
 
         function addToCart(id) {
             const item = foodItems.find(i => i.id === id);
             if (!item) return;
 
-            const existingIdx = cart.findIndex(c => c.id === id);
-            if (existingIdx !== -1) {
-                cart[existingIdx].qty += 1;
+            const existing = cart.find(c => c.id === id);
+            if (existing) {
+                existing.qty += 1;
             } else {
                 cart.push({ ...item, qty: 1 });
             }
@@ -1636,114 +1694,75 @@
             showToast(t('added_to_cart', { title: item.title }));
         }
 
-        function updateCartItemQty(idx, delta) {
-            if (cart[idx]) {
-                cart[idx].qty += delta;
-                if (cart[idx].qty <= 0) {
-                    cart.splice(idx, 1);
-                }
-                updateCartUI();
-            }
-        }
-
         function addToCartFromModal() {
             if (activeModalItemId) {
                 addToCart(activeModalItemId);
-                closeDetailModal();
             }
         }
 
         function updateCartUI() {
-            const floatingBadge = document.getElementById('floatingCartBadge');
+            const badge = document.getElementById('floatingCartBadge');
             const cartList = document.getElementById('cartList');
             const cartTotal = document.getElementById('cartTotal');
 
-            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
-            if (totalCount > 0) {
-                floatingBadge.textContent = totalCount;
-                floatingBadge.classList.remove('hidden');
+            if (totalQty > 0) {
+                badge.textContent = totalQty;
+                badge.classList.remove('hidden');
             } else {
-                floatingBadge.classList.add('hidden');
+                badge.classList.add('hidden');
             }
 
-            let total = 0;
+            cartTotal.textContent = `HK$${totalPrice.toFixed(1)}`;
+
             if (cart.length === 0) {
                 cartList.innerHTML = `
                     <div class="text-center py-12 text-slate-400 space-y-2">
-                        <i class="fa-solid fa-basket-shopping text-3xl" aria-hidden="true"></i>
-                        <p class="text-xs font-semibold">${t('cart_empty')}</p>
+                        <i class="fa-solid fa-basket-shopping text-3xl opacity-40" aria-hidden="true"></i>
+                        <p class="text-xs">${t('cart_empty')}</p>
                     </div>
                 `;
-            } else {
-                cartList.innerHTML = cart.map((item, idx) => {
-                    const itemTotal = parseFloat(item.price) * item.qty;
-                    total += itemTotal;
-                    return `
-                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                                <img src="${escapeHtml(item.image)}" class="w-12 h-12 rounded-xl object-cover shrink-0" onerror="this.src='https://placehold.co/100x100'">
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-900 truncate">${escapeHtml(item.title)}</h4>
-                                    <span class="text-[11px] font-semibold text-slate-400">HK$${parseFloat(item.price).toFixed(1)}</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <div class="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden text-xs">
-                                    <button onclick="updateCartItemQty(${idx}, -1)" aria-label="減少數量" class="px-2 py-1 text-slate-600 hover:bg-slate-100 font-bold cursor-pointer">-</button>
-                                    <span class="px-2 font-black text-slate-800">${item.qty}</span>
-                                    <button onclick="updateCartItemQty(${idx}, 1)" aria-label="增加數量" class="px-2 py-1 text-slate-600 hover:bg-slate-100 font-bold cursor-pointer">+</button>
-                                </div>
-                                <button onclick="removeFromCart(${idx})" aria-label="移除餐點" class="text-slate-400 hover:text-red-500 p-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-trash-can text-xs" aria-hidden="true"></i>
-                                </button>
-                            </div>
+                return;
+            }
+
+            cartList.innerHTML = cart.map(item => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
+                    <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="w-12 h-12 rounded-xl object-cover shrink-0" onerror="this.src='https://placehold.co/100x100/fff7ed/ea580c?text=Food'">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-slate-800 text-xs truncate">${escapeHtml(item.title)}</h4>
+                        <p class="text-[11px] font-bold text-brand-600 mt-0.5">HK$${parseFloat(item.price).toFixed(1)}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div class="flex items-center bg-white border border-slate-200 rounded-lg p-0.5">
+                            <button onclick="updateCartQty('${escapeHtml(item.id)}', -1)" aria-label="減少數量" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded cursor-pointer font-bold text-xs">-</button>
+                            <span class="w-6 text-center text-xs font-black text-slate-800">${item.qty}</span>
+                            <button onclick="updateCartQty('${escapeHtml(item.id)}', 1)" aria-label="增加數量" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded cursor-pointer font-bold text-xs">+</button>
                         </div>
-                    `;
-                }).join('');
-            }
-
-            cartTotal.textContent = `HK$${total.toFixed(1)}`;
+                        <button onclick="removeFromCart('${escapeHtml(item.id)}')" aria-label="移除此品項" class="text-slate-400 hover:text-red-500 p-1 cursor-pointer">
+                            <i class="fa-solid fa-trash-can text-xs" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
+        function updateCartQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                removeFromCart(id);
+            } else {
+                updateCartUI();
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(c => c.id !== id);
             updateCartUI();
-        }
-
-        function showConfirmDialog(title, msg, actionFn) {
-            document.getElementById('confirmModalTitle').textContent = title;
-            document.getElementById('confirmModalMsg').textContent = msg;
-            pendingConfirmAction = actionFn;
-
-            const modal = document.getElementById('confirmModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-                trapFocus(modal);
-            }, 10);
-        }
-
-        function closeConfirmModal(executed = false) {
-            const modal = document.getElementById('confirmModal');
-            if (modal.classList.contains('hidden')) return;
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            releaseFocusTrap();
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                if (!executed) pendingConfirmAction = null;
-            }, 200);
-        }
-
-        function executeConfirmAction() {
-            if (typeof pendingConfirmAction === 'function') {
-                const action = pendingConfirmAction;
-                pendingConfirmAction = null;
-                closeConfirmModal(true);
-                action();
-            }
         }
 
         function clearCart() {
@@ -1751,42 +1770,15 @@
                 showToast(t('toast_cart_empty'));
                 return;
             }
-            showConfirmDialog(t('confirm_clear_cart_title'), t('confirm_clear_cart_msg'), () => {
-                cart = [];
-                updateCartUI();
-                showToast(t('toast_cleared_cart'));
-            });
-        }
-
-        function toggleCartDrawer() {
-            const drawer = document.getElementById('cartDrawer');
-            if (drawer.classList.contains('hidden') || drawer.classList.contains('translate-x-full')) {
-                openCartDrawer();
-            } else {
-                closeCartDrawer();
-            }
-        }
-
-        function openCartDrawer() {
-            const drawer = document.getElementById('cartDrawer');
-            drawer.classList.remove('hidden');
-            drawer.setAttribute('aria-hidden', 'false');
-            setTimeout(() => {
-                drawer.classList.remove('translate-x-full');
-                trapFocus(drawer);
-            }, 10);
-        }
-
-        function closeCartDrawer() {
-            const drawer = document.getElementById('cartDrawer');
-            if (!drawer.classList.contains('translate-x-full')) {
-                drawer.classList.add('translate-x-full');
-                drawer.setAttribute('aria-hidden', 'true');
-                releaseFocusTrap();
-                setTimeout(() => {
-                    drawer.classList.add('hidden');
-                }, 300);
-            }
+            showConfirmModal(
+                t('confirm_clear_cart_title'),
+                t('confirm_clear_cart_msg'),
+                () => {
+                    cart = [];
+                    updateCartUI();
+                    showToast(t('toast_cleared_cart'));
+                }
+            );
         }
 
         function showOrderSuccessToast() {
@@ -1794,31 +1786,10 @@
                 showToast(t('cart_empty'), true);
                 return;
             }
-            closeCartDrawer();
-            showToast(t('order_success'));
             cart = [];
             updateCartUI();
-        }
-
-        function deleteItemFromModal() {
-            if (!activeModalItemId) return;
-            showConfirmDialog(t('confirm_delete_title'), t('confirm_delete_msg'), () => {
-                foodItems = foodItems.filter(i => i.id !== activeModalItemId);
-                saveItems();
-                closeDetailModal();
-                renderCategories();
-                renderMenu();
-                showToast(t('toast_deleted'));
-            });
-        }
-
-        function editCurrentItem() {
-            if (!activeModalItemId) return;
-            const item = foodItems.find(i => i.id === activeModalItemId);
-            closeDetailModal();
-            if (item) {
-                openAddModal(item);
-            }
+            closeCartDrawer();
+            showToast(t('order_success'));
         }
 
         function pickRandomFood() {
@@ -1833,6 +1804,9 @@
         }
 
         function handleSearch() {
+            const searchVal = document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value;
+            document.getElementById('searchInput').value = searchVal;
+            document.getElementById('mobileSearchInput').value = searchVal;
             renderMenu();
         }
 
@@ -1842,58 +1816,66 @@
             renderMenu();
         }
 
+        // Stats Modal Logic
         function toggleStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal.classList.contains('hidden')) {
-                const totalItems = foodItems.length;
-                const totalPrice = foodItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
-                const avgPrice = totalItems > 0 ? (totalPrice / totalItems).toFixed(1) : 0;
-
-                document.getElementById('statTotalItems').textContent = totalItems;
-                document.getElementById('statAvgPrice').textContent = `HK$${avgPrice}`;
-
-                const catCounts = {};
-                foodItems.forEach(i => {
-                    const cKey = getCategoryKey(i.category);
-                    catCounts[cKey] = (catCounts[cKey] || 0) + 1;
-                });
-
-                const breakdownContainer = document.getElementById('categoryBreakdown');
-                breakdownContainer.innerHTML = Object.keys(catCounts).map(cKey => {
-                    const count = catCounts[cKey];
-                    const pct = totalItems > 0 ? Math.round((count / totalItems) * 100) : 0;
-                    const cLabel = t(`cat_${cKey}`);
-                    return `
-                        <div>
-                            <div class="flex justify-between font-bold text-slate-700 mb-1">
-                                <span>${escapeHtml(cLabel)}</span>
-                                <span class="text-brand-600">${count} (${pct}%)</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                                <div class="h-full bg-brand-500 rounded-full" style="width: ${pct}%"></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
+                renderStats();
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     modal.classList.remove('opacity-0');
                     trapFocus(modal);
                 }, 10);
             } else {
-                closeStatsModal();
+                modal.classList.add('opacity-0');
+                releaseFocusTrap();
+                setTimeout(() => modal.classList.add('hidden'), 200);
             }
         }
 
-        function closeStatsModal() {
-            const modal = document.getElementById('statsModal');
-            if (modal.classList.contains('hidden')) return;
-            modal.classList.add('opacity-0');
-            releaseFocusTrap();
-            setTimeout(() => modal.classList.add('hidden'), 200);
+        function renderStats() {
+            const totalItemsEl = document.getElementById('statTotalItems');
+            const avgPriceEl = document.getElementById('statAvgPrice');
+            const breakdownEl = document.getElementById('categoryBreakdown');
+
+            const total = foodItems.length;
+            totalItemsEl.textContent = total;
+
+            if (total === 0) {
+                avgPriceEl.textContent = 'HK$0.0';
+                breakdownEl.innerHTML = `<p class="text-slate-400 text-xs">${t('no_items_title')}</p>`;
+                return;
+            }
+
+            const totalPrice = foodItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            avgPriceEl.textContent = `HK$${(totalPrice / total).toFixed(1)}`;
+
+            const catCounts = { mains: 0, drinks: 0, desserts: 0, snacks: 0 };
+            foodItems.forEach(item => {
+                const key = getCategoryKey(item.category);
+                if (catCounts[key] !== undefined) catCounts[key]++;
+            });
+
+            breakdownEl.innerHTML = Object.keys(catCounts).map(key => {
+                const count = catCounts[key];
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const label = t(`cat_${key}`);
+
+                return `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700">
+                            <span>${escapeHtml(label)}</span>
+                            <span>${count} 項 (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div class="bg-brand-600 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
+        // Data Modal & Backup Logic
         function toggleDataModal() {
             const modal = document.getElementById('dataModal');
             if (modal.classList.contains('hidden')) {
@@ -1903,110 +1885,130 @@
                     trapFocus(modal);
                 }, 10);
             } else {
-                closeDataModal();
+                modal.classList.add('opacity-0');
+                releaseFocusTrap();
+                setTimeout(() => modal.classList.add('hidden'), 200);
             }
         }
 
-        function closeDataModal() {
-            const modal = document.getElementById('dataModal');
-            if (modal.classList.contains('hidden')) return;
-            modal.classList.add('opacity-0');
-            releaseFocusTrap();
-            setTimeout(() => modal.classList.add('hidden'), 200);
+        async function exportData() {
+            if (foodItems.length === 0) {
+                showToast(t('toast_no_data'), true);
+                return;
+            }
+
+            const exportPayload = {
+                version: "1.8",
+                restaurantName: restaurantName,
+                exportedAt: new Date().toISOString(),
+                items: foodItems
+            };
+
+            const jsonStr = JSON.stringify(exportPayload, null, 2);
+            const fileName = `GourmetLog_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            const file = new File([jsonStr], fileName, { type: 'application/json' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'GourmetLog 備份資料',
+                        text: t('toast_ios_save'),
+                        files: [file]
+                    });
+                    showToast(t('toast_export_success'));
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+
+            try {
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast(t('toast_export_success'));
+            } catch (err) {
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = jsonStr;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast(t('toast_copied_json'));
+                } catch (copyErr) {
+                    showToast('匯出失敗，請重試', true);
+                }
+            }
         }
 
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedItems = [];
+                    if (Array.isArray(parsed)) {
+                        importedItems = parsed;
+                    } else if (parsed && Array.isArray(parsed.items)) {
+                        importedItems = parsed.items;
+                        if (parsed.restaurantName) {
+                            restaurantName = parsed.restaurantName;
+                            localStorage.setItem('gourmet_restaurant_name', restaurantName);
+                            updateRestaurantNameUI();
+                        }
+                    }
+
+                    if (importedItems.length > 0) {
+                        foodItems = importedItems;
+                        saveItems();
+                        renderMenu();
+                        toggleDataModal();
+                        showToast(t('toast_imported'));
+                    } else {
+                        showToast(t('toast_format_error'), true);
+                    }
+                } catch (err) {
+                    showToast(t('toast_parse_error'), true);
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function resetToSampleData() {
+            showConfirmModal(
+                t('confirm_reset_title'),
+                t('confirm_reset_msg'),
+                () => {
+                    foodItems = [...defaultFoodItems];
+                    restaurantName = '荃港大冰室';
+                    localStorage.setItem('gourmet_restaurant_name', restaurantName);
+                    updateRestaurantNameUI();
+                    saveItems();
+                    renderMenu();
+                    toggleDataModal();
+                    showToast(t('toast_reset_success'));
+                }
+            );
+        }
+
+        // Printable Menu PDF Export Module
         function exportMenuPDF() {
             if (foodItems.length === 0) {
                 showToast(t('toast_pdf_no_data'), true);
                 return;
             }
-
-            const printContainer = document.getElementById('printableMenu');
-            const previewContainer = document.getElementById('menuPreviewContent');
-            const todayStr = new Date().toLocaleDateString(currentLang === 'zh' ? 'zh-HK' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            const categoryOrderKeys = ['mains', 'drinks', 'desserts', 'snacks'];
-            const grouped = {};
-            
-            foodItems.forEach(item => {
-                const cKey = getCategoryKey(item.category);
-                if (!grouped[cKey]) grouped[cKey] = [];
-                grouped[cKey].push(item);
-            });
-
-            const allCatKeys = Array.from(new Set([...categoryOrderKeys, ...Object.keys(grouped)]));
-
-            let categoryHtml = '';
-
-            allCatKeys.forEach(cKey => {
-                const items = grouped[cKey];
-                if (!items || items.length === 0) return;
-
-                const catLabel = t(`cat_${cKey}`);
-
-                const itemsHtml = items.map(item => {
-                    const starsStr = '★'.repeat(Math.floor(item.rating)) + (item.rating % 1 >= 0.5 ? '½' : '');
-                    return `
-                        <div class="menu-page-break-avoid mb-4 p-3 border-b border-slate-200 flex items-start gap-4">
-                            <img src="${escapeHtml(item.image)}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0" onerror="this.style.display='none'">
-                            <div class="flex-1">
-                                <div class="flex items-baseline justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-black text-slate-900 text-base">${escapeHtml(item.title)}</span>
-                                        <span class="text-amber-500 text-xs font-bold">${starsStr}</span>
-                                    </div>
-                                    <div class="leader-dots hidden sm:block"></div>
-                                    <span class="font-black text-brand-700 text-base shrink-0">HK$${parseFloat(item.price).toFixed(1)}</span>
-                                </div>
-                                <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
-                                    ${item.location ? `<span><i class="fa-solid fa-location-dot text-slate-400" aria-hidden="true"></i> ${escapeHtml(item.location)}</span>` : ''}
-                                </div>
-                                ${item.notes ? `<p class="text-xs text-slate-600 italic mt-1.5 bg-slate-50 p-2 rounded-lg border border-slate-100">${escapeHtml(item.notes)}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                categoryHtml += `
-                    <div class="menu-page-break-avoid mb-6">
-                        <div class="flex items-center gap-3 mb-3 border-b-2 border-slate-900 pb-1">
-                            <h3 class="text-lg font-black text-slate-900 tracking-wide">${escapeHtml(catLabel)}</h3>
-                            <span class="text-xs font-bold text-slate-500">(${t('items_count_pdf', { count: items.length })})</span>
-                        </div>
-                        <div class="space-y-1">
-                            ${itemsHtml}
-                        </div>
-                    </div>
-                `;
-            });
-
-            const fullMenuHtml = `
-                <div class="border-4 border-slate-900 p-6 sm:p-8 bg-white text-slate-900 shadow-none">
-                    <div class="text-center border-b-2 border-slate-900 pb-6 mb-6">
-                        <p class="text-xs font-bold tracking-widest text-brand-600 uppercase mb-1">${t('menu_subtitle_pdf')}</p>
-                        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">${escapeHtml(restaurantName)}</h1>
-                        <p class="text-xs text-slate-500 font-semibold mt-2">${t('print_date')}：${todayStr} ｜ ${t('menu_footer_tag')}</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        ${categoryHtml}
-                    </div>
-
-                    <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-400 font-medium">
-                        <span>GourmetLog System</span>
-                        <span>${escapeHtml(restaurantName)} ‧ ${t('menu_footer_tag')}</span>
-                    </div>
-                </div>
-            `;
-
-            printContainer.innerHTML = fullMenuHtml;
-            previewContainer.innerHTML = fullMenuHtml;
-
-            closeDataModal();
-            openMenuPreviewModal();
-        }
-
-        function openMenuPreviewModal() {
+            renderPrintableMenu();
             const modal = document.getElementById('menuPreviewModal');
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -2023,169 +2025,158 @@
             setTimeout(() => modal.classList.add('hidden'), 200);
         }
 
+        function renderPrintableMenu() {
+            const previewContainer = document.getElementById('menuPreviewContent');
+            const printContainer = document.getElementById('printableMenu');
+
+            const todayStr = new Date().toLocaleDateString(currentLang === 'zh' ? 'zh-HK' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const grouped = { mains: [], drinks: [], desserts: [], snacks: [] };
+            foodItems.forEach(item => {
+                const key = getCategoryKey(item.category);
+                if (grouped[key]) grouped[key].push(item);
+                else grouped.mains.push(item);
+            });
+
+            const htmlContent = `
+                <div class="space-y-6">
+                    <div class="border-b-2 border-slate-900 pb-4 text-center space-y-1.5">
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600">${escapeHtml(t('menu_subtitle_pdf'))}</span>
+                        <h1 class="text-3xl font-black text-slate-900">${escapeHtml(restaurantName)}</h1>
+                        <div class="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500 pt-1">
+                            <span><i class="fa-solid fa-calendar-day mr-1"></i> ${escapeHtml(t('print_date'))}: ${todayStr}</span>
+                            <span>•</span>
+                            <span><i class="fa-solid fa-utensils mr-1"></i> ${escapeHtml(t('items_count_pdf', { count: foodItems.length }))}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        ${Object.keys(grouped).map(catKey => {
+                            const items = grouped[catKey];
+                            if (items.length === 0) return '';
+                            const catLabel = t(`cat_${catKey}`);
+
+                            return `
+                                <div class="menu-page-break-avoid space-y-3">
+                                    <div class="flex items-center gap-2 border-b border-slate-300 pb-1">
+                                        <span class="text-base font-black text-slate-900">${escapeHtml(catLabel)}</span>
+                                        <span class="text-xs text-slate-400 font-bold">(${items.length})</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                                        ${items.map(dish => `
+                                            <div class="flex items-baseline justify-between text-xs py-1">
+                                                <div class="font-bold text-slate-800 shrink-0 max-w-[65%]">
+                                                    ${escapeHtml(dish.title)}
+                                                    ${dish.rating >= 4.8 ? '<span class="text-amber-500 ml-1">★</span>' : ''}
+                                                </div>
+                                                <div class="leader-dots"></div>
+                                                <div class="font-black text-slate-900 shrink-0">HK$${parseFloat(dish.price).toFixed(1)}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="border-t border-slate-200 pt-4 mt-8 flex justify-between items-center text-[10px] text-slate-400 font-medium">
+                        <span>GourmetLog v1.8 — ${escapeHtml(restaurantName)}</span>
+                        <span>${escapeHtml(t('menu_footer_tag'))}</span>
+                    </div>
+                </div>
+            `;
+
+            previewContainer.innerHTML = htmlContent;
+            printContainer.innerHTML = htmlContent;
+        }
+
         function triggerPrint() {
-            try {
-                window.print();
-            } catch (err) {
-                showToast('瀏覽器限制直接列印，請點擊「新頁面列印」按鈕', true);
-            }
+            window.print();
         }
 
         function openPrintInNewWindow() {
-            const printContent = document.getElementById('printableMenu').innerHTML;
-            const printWin = window.open('', '_blank');
-            if (!printWin) {
-                showToast('彈出式視窗被瀏覽器封鎖，請允許彈出視窗後重試', true);
-                return;
-            }
-            printWin.document.write(`
+            const content = document.getElementById('printableMenu').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
                 <!DOCTYPE html>
-                <html lang="${currentLang === 'zh' ? 'zh-HK' : 'en'}">
+                <html>
                 <head>
-                    <meta charset="UTF-8">
-                    <title>${escapeHtml(restaurantName)} - Menu</title>
+                    <title>${escapeHtml(restaurantName)} - GourmetLog Menu</title>
                     <script src="https://cdn.tailwindcss.com"><\/script>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
                     <style>
-                        body { font-family: 'Noto Sans TC', sans-serif; background: #ffffff; color: #000; padding: 20px; }
+                        body { font-family: sans-serif; padding: 20px; }
                         .leader-dots { flex-grow: 1; border-bottom: 2px dotted #94a3b8; margin: 0 12px; position: relative; top: -4px; }
-                        .menu-page-break-avoid { break-inside: avoid; page-break-inside: avoid; }
+                        @media print { body { padding: 0; } }
                     </style>
                 </head>
-                <body>
-                    ${printContent}
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 400);
-                        };
-                    <\/script>
+                <body onload="window.print()">
+                    <div class="max-w-3xl mx-auto">
+                        ${content}
+                    </div>
                 </body>
                 </html>
             `);
-            printWin.document.close();
+            printWindow.document.close();
         }
 
-        async function exportData() {
-            if (!foodItems || foodItems.length === 0) {
-                showToast(t('toast_no_data'), true);
-                return;
-            }
+        // Custom Confirmation Modal Helper
+        function showConfirmModal(title, msg, actionFn) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMsg').textContent = msg;
+            pendingConfirmAction = actionFn;
 
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            const dateStr = new Date().toISOString().split('T')[0];
-            const filename = `GourmetLog_Backup_${dateStr}.json`;
-            const jsonString = JSON.stringify(foodItems, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const file = new File([blob], filename, { type: 'application/json' });
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                trapFocus(modal);
+            }, 10);
+        }
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    const shareData = { files: [file] };
-                    if (!isIOS) {
-                        shareData.title = 'GourmetLog Backup';
-                    }
-                    await navigator.share(shareData);
-                    showToast(t('toast_ios_save'));
-                    return;
-                } catch (err) {
-                    if (err.name === 'AbortError') {
-                        return;
-                    }
-                }
-            }
+        function closeConfirmModal(exec = false) {
+            const modal = document.getElementById('confirmModal');
+            if (modal.classList.contains('hidden')) return;
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (!exec) pendingConfirmAction = null;
+            }, 200);
+        }
 
-            if (isIOS) {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    try {
-                        await navigator.clipboard.writeText(jsonString);
-                        showToast(t('toast_copied_json'));
-                        return;
-                    } catch (e) {
-                        // Copy failed
-                    }
-                }
-                showToast(t('toast_no_data'), true);
-                return;
-            }
-
-            try {
-                const url = URL.createObjectURL(blob);
-                const dlAnchor = document.createElement('a');
-                dlAnchor.href = url;
-                dlAnchor.download = filename;
-                document.body.appendChild(dlAnchor);
-                dlAnchor.click();
-                document.body.removeChild(dlAnchor);
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-                showToast(t('toast_export_success'));
-            } catch (err) {
-                showToast('匯出失敗，請重試', true);
+        function executeConfirmAction() {
+            if (typeof pendingConfirmAction === 'function') {
+                const fn = pendingConfirmAction;
+                closeConfirmModal(true);
+                fn();
             }
         }
 
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        foodItems = imported;
-                        saveItems();
-                        renderCategories();
-                        renderMenu();
-                        closeDataModal();
-                        showToast(t('toast_imported'));
-                    } else {
-                        showToast(t('toast_format_error'), true);
-                    }
-                } catch (err) {
-                    showToast(t('toast_parse_error'), true);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function resetToSampleData() {
-            showConfirmDialog(t('confirm_reset_title'), t('confirm_reset_msg'), () => {
-                foodItems = [...defaultFoodItems];
-                saveItems();
-                renderCategories();
-                renderMenu();
-                closeDataModal();
-                showToast(t('toast_reset_success'));
-            });
-        }
-
+        // Notification Toast Helper (Fix: Fast auto-dismiss)
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
             const toastIcon = document.getElementById('toastIcon');
 
-            if (toastTimer) {
-                clearTimeout(toastTimer);
-                toastTimer = null;
-            }
+            if (!toast || !toastMsg) return;
 
             toastMsg.textContent = msg;
-
             if (isError) {
-                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-base";
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400 text-base shrink-0';
             } else {
-                toastIcon.className = "fa-solid fa-circle-check text-green-400 text-base";
+                toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base shrink-0';
             }
 
-            toast.classList.remove('opacity-0', '-translate-y-12', 'sm:translate-y-20', 'pointer-events-none');
-            toast.classList.add('opacity-100', 'translate-y-0');
+            if (toastTimer) clearTimeout(toastTimer);
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
 
             toastTimer = setTimeout(() => {
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', '-translate-y-12', 'sm:translate-y-20', 'pointer-events-none');
-            }, 3000);
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
         }
     </script>
 </body>
