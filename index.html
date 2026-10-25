@@ -132,7 +132,7 @@
                 <i class="fa-solid fa-utensils" aria-hidden="true"></i>
             </div>
 
-            <!-- Title & Subtitle + Kicker Badge (Fix: Wrap long English text cleanly in badge) -->
+            <!-- Title & Subtitle + Kicker Badge -->
             <div class="space-y-2 w-full">
                 <span id="welcomeBadge" class="px-3 py-1 bg-amber-500/20 text-amber-400 text-[10px] sm:text-xs font-bold rounded-xl sm:rounded-full border border-amber-500/30 uppercase tracking-normal sm:tracking-widest max-w-full inline-block text-center whitespace-normal leading-tight break-words">
                     自助點餐 & 美食紀錄系統
@@ -147,7 +147,7 @@
                 <span id="welcomeTableTag" class="bg-brand-600 text-white px-2.5 py-1 rounded-lg font-bold">堂食 / A-08 桌</span>
             </div>
 
-            <!-- Big Start Ordering Button (Fix: High visibility & safe touch padding for ≤360px) -->
+            <!-- Big Start Ordering Button -->
             <button onclick="startOrdering()" id="welcomeStartBtn" aria-label="開始點餐" class="w-full py-3.5 sm:py-4 bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 active:scale-95 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-brand-500/25 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer shrink-0">
                 <span>開始點餐</span>
                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    <!-- Top Navigation Header (Fix: Responsive tight layout, no horizontal overflow) -->
+    <!-- Top Navigation Header -->
     <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs w-full max-w-full overflow-hidden">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             
@@ -185,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- Action Buttons Row (Fix: Compact spacing on mobile to avoid overflow) -->
+            <!-- Action Buttons Row -->
             <div class="flex items-center gap-1 sm:gap-2 shrink-0">
                 <!-- Header Language Switcher Button -->
                 <button onclick="toggleLanguage()" id="headerLangBtn" class="px-2 py-1.5 sm:px-2.5 text-slate-700 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-colors cursor-pointer text-xs font-extrabold border border-slate-200 flex items-center gap-1" title="切換介面語言 / Switch Language">
@@ -224,7 +224,7 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-36 sm:pb-32 flex flex-col md:flex-row gap-5">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-40 sm:pb-36 flex flex-col md:flex-row gap-5">
         
         <!-- Sidebar / Category Selector -->
         <aside class="w-full md:w-60 shrink-0 space-y-4">
@@ -234,7 +234,7 @@
                     <h2 id="sidebarCatHeader" class="text-xs font-bold text-slate-400 uppercase tracking-wider">點餐類別選單</h2>
                     <span id="totalItemsBadge" class="text-[11px] font-extrabold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md">0 項</span>
                 </div>
-                <nav class="flex md:flex-col gap-1.5 overflow-x-auto hide-scrollbar pb-1 md:pb-0" id="categoryNav">
+                <nav class="flex max-[400px]:flex-wrap md:flex-col gap-1.5 overflow-x-auto hide-scrollbar pb-1 md:pb-0" id="categoryNav">
                     <!-- Categories dynamically generated here -->
                 </nav>
             </div>
@@ -302,13 +302,13 @@
         </section>
     </main>
 
-    <!-- Floating Cart FAB (Fix: Elevated bottom/right inset to sit clearly above Netlify badge & bottom bars) -->
-    <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[80] w-13 h-13 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
+    <!-- Floating Cart FAB -->
+    <button id="floatingCartBtn" onclick="toggleCartDrawer()" aria-label="開啟點單清單" class="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 z-[80] w-14 h-14 sm:w-16 sm:h-16 bg-brand-600 hover:bg-brand-700 active:scale-90 text-white rounded-full shadow-2xl shadow-brand-600/40 flex items-center justify-center transition-all duration-200 border-2 border-white/30 cursor-pointer" title="開啟點單清單">
         <i class="fa-solid fa-cart-shopping text-lg sm:text-2xl" aria-hidden="true"></i>
         <span id="floatingCartBadge" class="hidden absolute -top-1 -right-1 bg-amber-400 text-slate-900 font-black text-xs sm:text-sm w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border-2 border-white shadow-md">0</span>
     </button>
 
-    <!-- Slide-over Cart Drawer (Fix: Safe bottom padding so submit/clear buttons aren't blocked) -->
+    <!-- Slide-over Cart Drawer -->
     <div id="cartDrawer" role="dialog" aria-modal="true" aria-label="今日點單購物車" class="fixed inset-y-0 right-0 z-[100] w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col hidden" aria-hidden="true">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
             <div class="flex items-center gap-2.5">
@@ -391,7 +391,7 @@
         </div>
     </div>
 
-    <!-- Add / Edit Food Record Modal (Fix: Scrollable form body so save button is never hidden) -->
+    <!-- Add / Edit Food Record Modal -->
     <div id="addModal" role="dialog" aria-modal="true" aria-label="新增或編輯美食紀錄" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
         <div id="addModalCard" class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[88vh] flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3 shrink-0">
@@ -586,8 +586,8 @@
         </div>
     </div>
 
-    <!-- Notification Toast (Fix: Placed below sticky header on mobile so top right & drawer close remain unobstructed) -->
-    <div id="toast" class="fixed top-20 sm:top-auto sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
+    <!-- Notification Toast (Fix: Raised top position to top-28 on mobile so search bar is clear) -->
+    <div id="toast" class="fixed top-28 sm:top-auto sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 z-[140] max-w-sm sm:max-w-md ml-auto bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transform opacity-0 transition-all duration-300 pointer-events-none border border-slate-700/50">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-base shrink-0" aria-hidden="true"></i>
         <span id="toastMsg" class="text-xs sm:text-sm font-semibold leading-snug">提示訊息</span>
     </div>
@@ -887,7 +887,6 @@
             return text;
         }
 
-        // Category mapping helper for backwards compatibility with older JSON backups
         const CATEGORY_MAP = {
             '主食': 'mains', 'mains': 'mains', 'main': 'mains',
             '特飲': 'drinks', 'drinks': 'drinks', 'special drinks': 'drinks',
@@ -964,16 +963,15 @@
 
         let foodItems = [];
         let currentCategoryKey = 'all';
-        let currentRatingFilter = 0; // 0 = all, 4 = 4+, 5 = 5.0 only
+        let currentRatingFilter = 0;
         let currentRatingInput = 5;
-        let cart = []; // Array of { ...item, qty: number }
+        let cart = [];
         let activeModalItemId = null;
         let restaurantName = '荃港大冰室';
         let currentTableCode = 'A-08';
         let pendingConfirmAction = null;
         let toastTimer = null;
 
-        // Focus Trap Module for Modals
         let activeFocusTrap = null;
         let previousFocusedElement = null;
 
@@ -1022,6 +1020,9 @@
         }
 
         window.onload = function() {
+            // Disable background scrolling while welcome screen is open
+            document.body.classList.add('overflow-hidden');
+            
             setRandomTableNumber();
             loadRestaurantName();
             loadItems();
@@ -1050,7 +1051,6 @@
         }
 
         function updateLanguageUI() {
-            // Update Welcome / Start Screen
             const btnZh = document.getElementById('welcomeLangZh');
             const btnEn = document.getElementById('welcomeLangEn');
             if (btnZh && btnEn) {
@@ -1069,7 +1069,6 @@
             document.getElementById('welcomeTableTag').textContent = t('table_prefix', { table: currentTableCode });
             document.getElementById('welcomeStartBtn').querySelector('span').textContent = t('start_ordering');
 
-            // Header Elements
             document.getElementById('headerLangText').textContent = currentLang === 'zh' ? 'EN' : '中文';
             document.getElementById('appHeaderBadge').textContent = t('secret_menu_badge');
             document.getElementById('appHeaderSubtitle').textContent = t('app_subtitle');
@@ -1078,7 +1077,6 @@
             document.getElementById('headerAddBtnText').textContent = t('add_record');
             document.getElementById('headerAddBtnTextShort').textContent = t('add_record_short');
 
-            // Sidebar Elements
             document.getElementById('sidebarCatHeader').textContent = t('nav_categories');
             document.getElementById('sidebarFilterHeader').textContent = t('sort_and_filters');
             document.getElementById('sortByLabel').textContent = t('sort_label');
@@ -1097,19 +1095,16 @@
             document.getElementById('emptyStateSub').textContent = t('no_items_sub');
             document.getElementById('emptyStateBtnText').textContent = t('no_items_btn');
 
-            // Cart Drawer
             document.getElementById('cartDrawerTitle').textContent = t('cart_title');
             document.getElementById('cartTotalLabel').textContent = t('total_budget');
             document.getElementById('clearCartBtn').textContent = t('clear_cart');
             document.getElementById('confirmOrderBtn').textContent = t('confirm_order');
 
-            // Food Detail Modal
             document.getElementById('detailNotesHeader').textContent = t('notes_label');
             document.getElementById('detailDeleteBtn').innerHTML = `<i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> ${t('delete_record')}`;
             document.getElementById('detailEditBtn').innerHTML = `<i class="fa-solid fa-pen mr-1" aria-hidden="true"></i> ${t('edit_record')}`;
             document.getElementById('detailAddToCartBtn').innerHTML = `<i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> ${t('add_to_cart')}`;
 
-            // Add/Edit Modal
             document.getElementById('labelPhoto').textContent = t('photo_label');
             document.getElementById('photoPlaceholderText').textContent = t('photo_placeholder');
             document.getElementById('photoSubText').textContent = t('photo_sub');
@@ -1132,14 +1127,12 @@
             document.getElementById('btnFormCancel').textContent = t('cancel');
             document.getElementById('btnFormSave').textContent = t('save');
 
-            // Stats Modal
             document.getElementById('statsTitle').innerHTML = `<i class="fa-solid fa-chart-pie text-brand-600" aria-hidden="true"></i> ${t('stats_title')}`;
             document.getElementById('statTotalItemsLabel').textContent = t('total_items_stat');
             document.getElementById('statAvgPriceLabel').textContent = t('avg_price_stat');
             document.getElementById('statBreakdownLabel').textContent = t('cat_breakdown');
             document.getElementById('statsCloseBtn').textContent = t('close');
 
-            // Settings Modal
             document.getElementById('settingsTitle').innerHTML = `<i class="fa-solid fa-gear text-brand-600" aria-hidden="true"></i> ${t('settings_title')}`;
             document.getElementById('labelRestaurantName').textContent = t('restaurant_name_label');
             document.getElementById('btnSaveRestName').textContent = t('save_name');
@@ -1151,11 +1144,9 @@
             document.getElementById('btnResetSampleText').textContent = t('reset_sample');
             document.getElementById('dataFinishBtn').textContent = t('finish');
 
-            // Confirmation Modal
             document.getElementById('confirmModalCancelBtn').textContent = t('cancel');
             document.getElementById('confirmModalActionBtn').textContent = t('confirm_exec');
 
-            // PDF Preview Modal
             document.getElementById('pdfPreviewTitle').textContent = t('pdf_title');
             document.getElementById('pdfPreviewSub').textContent = t('pdf_sub');
             document.getElementById('pdfDirectPrintText').textContent = t('direct_print');
@@ -1259,6 +1250,8 @@
         function startOrdering() {
             const welcome = document.getElementById('welcomeScreen');
             welcome.classList.add('opacity-0', 'pointer-events-none');
+            // Re-enable body scroll when welcome screen is closed
+            document.body.classList.remove('overflow-hidden');
             releaseFocusTrap();
             setTimeout(() => {
                 welcome.classList.add('hidden');
@@ -1270,6 +1263,8 @@
             const welcome = document.getElementById('welcomeScreen');
             welcome.classList.remove('hidden');
             welcome.removeAttribute('aria-hidden');
+            // Disable body scroll when welcome screen is displayed
+            document.body.classList.add('overflow-hidden');
             setTimeout(() => {
                 welcome.classList.remove('opacity-0', 'pointer-events-none');
                 trapFocus(welcome);
@@ -1600,7 +1595,6 @@
             const formattedDate = now.toISOString().split('T')[0];
 
             if (id) {
-                // Update Existing
                 const index = foodItems.findIndex(i => i.id === id);
                 if (index !== -1) {
                     foodItems[index] = {
@@ -1612,7 +1606,6 @@
                     showToast(t('toast_updated'));
                 }
             } else {
-                // Create New
                 const newItem = {
                     id: Date.now().toString(),
                     title, category, price, location, notes,
@@ -1653,7 +1646,6 @@
             );
         }
 
-        // Floating Cart Drawer Logic
         function toggleCartDrawer() {
             const drawer = document.getElementById('cartDrawer');
             if (drawer.classList.contains('hidden')) {
@@ -1816,11 +1808,10 @@
             renderMenu();
         }
 
-        // Stats Modal Logic
         function toggleStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal.classList.contains('hidden')) {
-                renderStats();
+                updateStatsUI();
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     modal.classList.remove('opacity-0');
@@ -1833,49 +1824,48 @@
             }
         }
 
-        function renderStats() {
+        function updateStatsUI() {
             const totalItemsEl = document.getElementById('statTotalItems');
             const avgPriceEl = document.getElementById('statAvgPrice');
-            const breakdownEl = document.getElementById('categoryBreakdown');
+            const bdEl = document.getElementById('categoryBreakdown');
 
             const total = foodItems.length;
             totalItemsEl.textContent = total;
 
             if (total === 0) {
                 avgPriceEl.textContent = 'HK$0.0';
-                breakdownEl.innerHTML = `<p class="text-slate-400 text-xs">${t('no_items_title')}</p>`;
+                bdEl.innerHTML = `<p class="text-slate-400 text-center py-2">尚無統計數據</p>`;
                 return;
             }
 
-            const totalPrice = foodItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            const totalPrice = foodItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
             avgPriceEl.textContent = `HK$${(totalPrice / total).toFixed(1)}`;
 
-            const catCounts = { mains: 0, drinks: 0, desserts: 0, snacks: 0 };
+            const counts = {};
             foodItems.forEach(item => {
                 const key = getCategoryKey(item.category);
-                if (catCounts[key] !== undefined) catCounts[key]++;
+                counts[key] = (counts[key] || 0) + 1;
             });
 
-            breakdownEl.innerHTML = Object.keys(catCounts).map(key => {
-                const count = catCounts[key];
-                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            bdEl.innerHTML = ['mains', 'drinks', 'desserts', 'snacks'].map(key => {
+                const count = counts[key] || 0;
+                const percent = Math.round((count / total) * 100);
                 const label = t(`cat_${key}`);
 
                 return `
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs font-semibold text-slate-700">
                             <span>${escapeHtml(label)}</span>
-                            <span>${count} 項 (${pct}%)</span>
+                            <span>${count} 項 (${percent}%)</span>
                         </div>
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div class="bg-brand-600 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-600 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Data Modal & Backup Logic
         function toggleDataModal() {
             const modal = document.getElementById('dataModal');
             if (modal.classList.contains('hidden')) {
@@ -1891,61 +1881,48 @@
             }
         }
 
-        async function exportData() {
+        function exportData() {
             if (foodItems.length === 0) {
                 showToast(t('toast_no_data'), true);
                 return;
             }
 
-            const exportPayload = {
+            const payload = {
                 version: "1.8",
                 restaurantName: restaurantName,
                 exportedAt: new Date().toISOString(),
                 items: foodItems
             };
 
-            const jsonStr = JSON.stringify(exportPayload, null, 2);
-            const fileName = `GourmetLog_Backup_${new Date().toISOString().slice(0,10)}.json`;
-            const file = new File([jsonStr], fileName, { type: 'application/json' });
+            const jsonStr = JSON.stringify(payload, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const fileName = `GourmetLog_Backup_${new Date().toISOString().slice(0, 10)}.json`;
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            if (isIOS && navigator.share && navigator.canShare) {
                 try {
-                    await navigator.share({
-                        title: 'GourmetLog 備份資料',
-                        text: t('toast_ios_save'),
-                        files: [file]
-                    });
-                    showToast(t('toast_export_success'));
-                    return;
-                } catch (err) {
-                    if (err.name === 'AbortError') return;
-                }
+                    const file = new File([blob], fileName, { type: 'application/json' });
+                    if (navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'GourmetLog Backup',
+                            text: t('toast_ios_save')
+                        }).catch(() => {});
+                        return;
+                    }
+                } catch (e) {}
             }
 
-            try {
-                const blob = new Blob([jsonStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast(t('toast_export_success'));
-            } catch (err) {
-                try {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = jsonStr;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    showToast(t('toast_copied_json'));
-                } catch (copyErr) {
-                    showToast('匯出失敗，請重試', true);
-                }
-            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(t('toast_export_success'));
         }
 
         function importData(event) {
@@ -1955,17 +1932,21 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const parsed = JSON.parse(e.target.result);
+                    const data = JSON.parse(e.target.result);
                     let importedItems = [];
-                    if (Array.isArray(parsed)) {
-                        importedItems = parsed;
-                    } else if (parsed && Array.isArray(parsed.items)) {
-                        importedItems = parsed.items;
-                        if (parsed.restaurantName) {
-                            restaurantName = parsed.restaurantName;
+
+                    if (Array.isArray(data)) {
+                        importedItems = data;
+                    } else if (data && Array.isArray(data.items)) {
+                        importedItems = data.items;
+                        if (data.restaurantName) {
+                            restaurantName = data.restaurantName;
                             localStorage.setItem('gourmet_restaurant_name', restaurantName);
                             updateRestaurantNameUI();
                         }
+                    } else {
+                        showToast(t('toast_format_error'), true);
+                        return;
                     }
 
                     if (importedItems.length > 0) {
@@ -1980,9 +1961,9 @@
                 } catch (err) {
                     showToast(t('toast_parse_error'), true);
                 }
-                event.target.value = '';
             };
             reader.readAsText(file);
+            event.target.value = '';
         }
 
         function resetToSampleData() {
@@ -2002,13 +1983,136 @@
             );
         }
 
-        // Printable Menu PDF Export Module
+        function showConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMsg').textContent = msg;
+            pendingConfirmAction = onConfirm;
+
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                trapFocus(modal);
+            }, 10);
+        }
+
+        function closeConfirmModal(execute = false) {
+            const modal = document.getElementById('confirmModal');
+            if (modal.classList.contains('hidden')) return;
+
+            modal.classList.add('opacity-0');
+            releaseFocusTrap();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (execute && typeof pendingConfirmAction === 'function') {
+                    pendingConfirmAction();
+                }
+                pendingConfirmAction = null;
+            }, 200);
+        }
+
+        function executeConfirmAction() {
+            closeConfirmModal(true);
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (toastTimer) clearTimeout(toastTimer);
+
+            toastMsg.textContent = msg;
+
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-base shrink-0";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-green-400 text-base shrink-0";
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2800);
+        }
+
         function exportMenuPDF() {
             if (foodItems.length === 0) {
                 showToast(t('toast_pdf_no_data'), true);
                 return;
             }
-            renderPrintableMenu();
+
+            const categories = ['mains', 'drinks', 'desserts', 'snacks'];
+            const todayStr = new Date().toISOString().slice(0, 10);
+
+            let htmlContent = `
+                <div class="border-4 border-slate-900 p-6 sm:p-8 rounded-3xl bg-white text-slate-900 space-y-6">
+                    <div class="text-center border-b-2 border-slate-900 pb-6 space-y-2">
+                        <span class="text-xs font-bold uppercase tracking-widest text-amber-600 border border-amber-500/40 bg-amber-50 px-3 py-1 rounded-full">${t('secret_menu_badge')}</span>
+                        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-1">${escapeHtml(restaurantName)}</h1>
+                        <p class="text-xs sm:text-sm font-medium text-slate-500">${t('menu_subtitle_pdf')} ‧ ${t('print_date')}: ${todayStr}</p>
+                    </div>
+
+                    <div class="space-y-6">
+            `;
+
+            categories.forEach(catKey => {
+                const catItems = foodItems.filter(item => getCategoryKey(item.category) === catKey);
+                if (catItems.length === 0) return;
+
+                const catLabel = t(`cat_${catKey}`);
+
+                htmlContent += `
+                    <div class="menu-page-break-avoid space-y-3">
+                        <div class="flex items-center gap-2 border-b-2 border-amber-500/30 pb-1">
+                            <h2 class="text-lg font-black text-slate-900 uppercase tracking-wide">${escapeHtml(catLabel)}</h2>
+                            <span class="text-xs text-amber-600 font-bold">(${catItems.length})</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                `;
+
+                catItems.forEach(item => {
+                    htmlContent += `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80 gap-3">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-baseline gap-2">
+                                    <h3 class="font-bold text-sm text-slate-900 truncate">${escapeHtml(item.title)}</h3>
+                                    <span class="text-xs text-amber-500 font-bold">★ ${item.rating}</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 truncate mt-0.5">${escapeHtml(item.location || t('no_location'))}</p>
+                            </div>
+                            <div class="text-right shrink-0 font-black text-slate-900 text-sm">
+                                HK$${parseFloat(item.price).toFixed(1)}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                htmlContent += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            htmlContent += `
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-200 flex flex-wrap justify-between items-center text-xs text-slate-400 font-medium gap-2">
+                        <span>GourmetLog v1.8 ‧ ${escapeHtml(restaurantName)}</span>
+                        <span>${t('menu_footer_tag')}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('printableMenu').innerHTML = htmlContent;
+            document.getElementById('menuPreviewContent').innerHTML = htmlContent;
+
+            toggleDataModal();
+            openMenuPreviewModal();
+        }
+
+        function openMenuPreviewModal() {
             const modal = document.getElementById('menuPreviewModal');
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -2022,72 +2126,9 @@
             if (modal.classList.contains('hidden')) return;
             modal.classList.add('opacity-0');
             releaseFocusTrap();
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-
-        function renderPrintableMenu() {
-            const previewContainer = document.getElementById('menuPreviewContent');
-            const printContainer = document.getElementById('printableMenu');
-
-            const todayStr = new Date().toLocaleDateString(currentLang === 'zh' ? 'zh-HK' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-            const grouped = { mains: [], drinks: [], desserts: [], snacks: [] };
-            foodItems.forEach(item => {
-                const key = getCategoryKey(item.category);
-                if (grouped[key]) grouped[key].push(item);
-                else grouped.mains.push(item);
-            });
-
-            const htmlContent = `
-                <div class="space-y-6">
-                    <div class="border-b-2 border-slate-900 pb-4 text-center space-y-1.5">
-                        <span class="text-xs font-bold uppercase tracking-widest text-brand-600">${escapeHtml(t('menu_subtitle_pdf'))}</span>
-                        <h1 class="text-3xl font-black text-slate-900">${escapeHtml(restaurantName)}</h1>
-                        <div class="flex items-center justify-center gap-4 text-xs font-semibold text-slate-500 pt-1">
-                            <span><i class="fa-solid fa-calendar-day mr-1"></i> ${escapeHtml(t('print_date'))}: ${todayStr}</span>
-                            <span>•</span>
-                            <span><i class="fa-solid fa-utensils mr-1"></i> ${escapeHtml(t('items_count_pdf', { count: foodItems.length }))}</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6">
-                        ${Object.keys(grouped).map(catKey => {
-                            const items = grouped[catKey];
-                            if (items.length === 0) return '';
-                            const catLabel = t(`cat_${catKey}`);
-
-                            return `
-                                <div class="menu-page-break-avoid space-y-3">
-                                    <div class="flex items-center gap-2 border-b border-slate-300 pb-1">
-                                        <span class="text-base font-black text-slate-900">${escapeHtml(catLabel)}</span>
-                                        <span class="text-xs text-slate-400 font-bold">(${items.length})</span>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                                        ${items.map(dish => `
-                                            <div class="flex items-baseline justify-between text-xs py-1">
-                                                <div class="font-bold text-slate-800 shrink-0 max-w-[65%]">
-                                                    ${escapeHtml(dish.title)}
-                                                    ${dish.rating >= 4.8 ? '<span class="text-amber-500 ml-1">★</span>' : ''}
-                                                </div>
-                                                <div class="leader-dots"></div>
-                                                <div class="font-black text-slate-900 shrink-0">HK$${parseFloat(dish.price).toFixed(1)}</div>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-
-                    <div class="border-t border-slate-200 pt-4 mt-8 flex justify-between items-center text-[10px] text-slate-400 font-medium">
-                        <span>GourmetLog v1.8 — ${escapeHtml(restaurantName)}</span>
-                        <span>${escapeHtml(t('menu_footer_tag'))}</span>
-                    </div>
-                </div>
-            `;
-
-            previewContainer.innerHTML = htmlContent;
-            printContainer.innerHTML = htmlContent;
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
         }
 
         function triggerPrint() {
@@ -2095,88 +2136,32 @@
         }
 
         function openPrintInNewWindow() {
-            const content = document.getElementById('printableMenu').innerHTML;
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
+            const printContent = document.getElementById('printableMenu').innerHTML;
+            const newWin = window.open('', '_blank');
+            newWin.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>${escapeHtml(restaurantName)} - GourmetLog Menu</title>
+                    <title>${escapeHtml(restaurantName)} - 專屬美食餐牌 PDF</title>
                     <script src="https://cdn.tailwindcss.com"><\/script>
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
                     <style>
-                        body { font-family: sans-serif; padding: 20px; }
-                        .leader-dots { flex-grow: 1; border-bottom: 2px dotted #94a3b8; margin: 0 12px; position: relative; top: -4px; }
-                        @media print { body { padding: 0; } }
+                        body { font-family: 'Noto Sans TC', sans-serif; padding: 20px; background: white; color: black; }
                     </style>
                 </head>
-                <body onload="window.print()">
-                    <div class="max-w-3xl mx-auto">
-                        ${content}
-                    </div>
+                <body>
+                    ${printContent}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        };
+                    <\/script>
                 </body>
                 </html>
             `);
-            printWindow.document.close();
-        }
-
-        // Custom Confirmation Modal Helper
-        function showConfirmModal(title, msg, actionFn) {
-            document.getElementById('confirmModalTitle').textContent = title;
-            document.getElementById('confirmModalMsg').textContent = msg;
-            pendingConfirmAction = actionFn;
-
-            const modal = document.getElementById('confirmModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                trapFocus(modal);
-            }, 10);
-        }
-
-        function closeConfirmModal(exec = false) {
-            const modal = document.getElementById('confirmModal');
-            if (modal.classList.contains('hidden')) return;
-            modal.classList.add('opacity-0');
-            releaseFocusTrap();
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                if (!exec) pendingConfirmAction = null;
-            }, 200);
-        }
-
-        function executeConfirmAction() {
-            if (typeof pendingConfirmAction === 'function') {
-                const fn = pendingConfirmAction;
-                closeConfirmModal(true);
-                fn();
-            }
-        }
-
-        // Notification Toast Helper (Fix: Fast auto-dismiss)
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
-
-            if (!toast || !toastMsg) return;
-
-            toastMsg.textContent = msg;
-            if (isError) {
-                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400 text-base shrink-0';
-            } else {
-                toastIcon.className = 'fa-solid fa-circle-check text-green-400 text-base shrink-0';
-            }
-
-            if (toastTimer) clearTimeout(toastTimer);
-
-            toast.classList.remove('opacity-0', 'pointer-events-none');
-            toast.classList.add('opacity-100');
-
-            toastTimer = setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0', 'pointer-events-none');
-            }, 2000);
+            newWin.document.close();
         }
     </script>
 </body>
